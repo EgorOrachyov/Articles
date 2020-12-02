@@ -160,11 +160,40 @@
 https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html
 
 @online{net:cuda_toolkit_docs,
-  author       = "NVIDIA",
-  title        = "CUDA Toolkit Documentation",
-  howpublished = "NVIDIA Developer Zone",
-  year         = 2020,
-  url          = {https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html},
-  urldate      = "01.12.2020",
-  language     = "english"
+    author       = "NVIDIA",
+    title        = "CUDA Toolkit Documentation",
+    howpublished = "NVIDIA Developer Zone",
+    year         = 2020,
+    url          = {https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html},
+    urldate      = "01.12.2020",
+    language     = "english"
+}
+
+@article{article:recursive_state_machines,
+    author = {Alur, Rajeev and Benedikt, Michael and Etessami, Kousha and Godefroid, Patrice and Reps, Thomas and Yannakakis, Mihalis},
+    title = {Analysis of Recursive State Machines},
+    year = {2005},
+    issue_date = {July 2005},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    volume = {27},
+    number = {4},
+    issn = {0164-0925},
+    url = {https://doi.org/10.1145/1075382.1075387},
+    doi = {10.1145/1075382.1075387},
+    abstract = {Recursive state machines (RSMs) enhance the power of ordinary state machines by allowing vertices to correspond either to ordinary states or to potentially recursive invocations of other state machines. RSMs can model the control flow in sequential imperative programs containing recursive procedure calls. They can be viewed as a visual notation extending Statecharts-like hierarchical state machines, where concurrency is disallowed but recursion is allowed. They are also related to various models of pushdown systems studied in the verification and program analysis communities.After introducing RSMs and comparing their expressiveness with other models, we focus on whether verification can be efficiently performed for RSMs. Our first goal is to examine the verification of linear time properties of RSMs. We begin this study by dealing with two key components for algorithmic analysis and model checking, namely, reachability (Is a target state reachable from initial states?) and cycle detection (Is there a reachable cycle containing an accepting state?). We show that both these problems can be solved in time O(nθ2) and space O(nθ), where n is the size of the recursive machine and θ is the maximum, over all component state machines, of the minimum of the number of entries and the number of exits of each component. From this, we easily derive algorithms for linear time temporal logic model checking with the same complexity in the model. We then turn to properties in the branching time logic CTL*, and again demonstrate a bound linear in the size of the state machine, but only for the case of RSMs with a single exit node.},
+    journal = {ACM Trans. Program. Lang. Syst.},
+    month = jul,
+    pages = {786–818},
+    numpages = {33},
+    keywords = {pushdown automata, Software verification, recursive state machines, temporal logic, model checking, program analysis, context-free languages}
+}
+
+@book{book:automata_theory,
+    author = {Hopcroft, John E. and Motwani, Rajeev and Ullman, Jeffrey D.},
+    title = {Introduction to Automata Theory, Languages, and Computation (3rd Edition)},
+    year = {2006},
+    isbn = {0321455363},
+    publisher = {Addison-Wesley Longman Publishing Co., Inc.},
+    address = {USA}
 }
