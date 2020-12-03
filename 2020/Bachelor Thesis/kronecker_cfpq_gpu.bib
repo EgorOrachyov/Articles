@@ -28,6 +28,7 @@
   language     = "russian"
 }
 
+% Graph data model application
 @inproceedings{article:querying_graph_databases,
     author = {Barcel\'{o} Baeza, Pablo},
     title = {Querying Graph Databases},
@@ -46,7 +47,8 @@
     series = {PODS '13}
 }
 
-@article{DBLP:journals/corr/ZhangFWR15,
+% Graph data model application (also cfpq on rdf example)
+@article{article:cfpq_and_rdf_analysis,
     author    = {Xiaowang Zhang and
                Zhiyong Feng and
                Xin Wang and
@@ -64,6 +66,7 @@
     bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 
+% Graph data model application
 @article{article:rna_prediction,
     author = {Anderson, James and Novák, Adám and Sükösd, Zsuzsanna and Golden, Michael and Arunapuram, Preeti and Edvardsson, Ingolfur and Hein, Jotun},
     year = {2013},
@@ -75,6 +78,7 @@
     doi = {10.1186/1471-2105-14-149}
 }
 
+% Graph data model application
 @article{article:dyck_cfl_code_analysis,
     author = {Zhang, Qirun and Lyu, Michael R. and Yuan, Hao and Su, Zhendong},
     title = {Fast Algorithms for Dyck-CFL-Reachability with Applications to Alias Analysis},
@@ -95,6 +99,7 @@
     keywords = {alias analysis, dyck-cfl-reachability}
 }
 
+% Graph databases overview
 @inbook{inbook:databases_intro,
     author = {Abiteboul, Serge and Hull, Richard and Vianu, Victor},
     year = {1995},
@@ -104,6 +109,7 @@
     isbn = {0-201-53771-0}
 }
 
+% Cfpq example
 @article{article:hellings_cfpq,
     author = {Hellings, Jelle},
     year = {2015},
@@ -112,6 +118,19 @@
     title = {Path Results for Context-free Grammar Queries on Graphs}
 }
 
+% Cfpq (relational semantic introduction)
+@inproceedings{article:hellings2014conjunctive,
+  doi = {10.5441/002/ICDT.2014.15},
+  url = {https://openproceedings.org/ICDT/2014/paper_34.pdf},
+  author = {Hellings,  Jelle},
+  keywords = {Database Theory,  Database Technology},
+  language = {eng},
+  title = {Conjunctive Context-Free Path Queries},
+  publisher = {OpenProceedings.org},
+  year = {2014}
+}
+
+% Cfpq example
 @inproceedings{inproceedings:matrix_cfpq,
     author = {Azimov, Rustam and Grigorev, Semyon},
     year = {2018},
@@ -121,6 +140,7 @@
     doi = {10.1145/3210259.3210264}
 }
 
+% Cfpq example
 @inbook{inbook:kronecker_cfpq_adbis,
     author = {Orachev, Egor and Epelbaum, Ilya and Azimov, Rustam and Grigorev, Semyon},
     year = {2020},
@@ -131,6 +151,7 @@
     doi = {10.1007/978-3-030-54832-2_6}
 }
 
+% Cfpq example
 @article{article:cfpq_go_for_rdf,
     author = {Medeiros, Ciro and Musicante, Martin and Costa, Umberto},
     year = {2020},
@@ -139,6 +160,7 @@
     title = {An Algorithm for Context-Free Path Queries over Graph Databases}
 }
 
+% 2019 matrix-algo evaluatoion for dense CUDA matrices
 @inproceedings{inproceedings:cfpq_matrix_evaluation,
     author = {Mishin, Nikita and Sokolov, Iaroslav and Spirin, Egor and Kutuev, Vladimir and Nemchinov, Egor and Gorbatyuk, Sergey and Grigorev, Semyon},
     year = {2019},
@@ -148,6 +170,7 @@
     doi = {10.1145/3327964.3328503}
 }
 
+% Most recent single source matrix-algo implementation with CUDA support
 @inproceedings{inproceedings:cfqp_matrix_with_single_source,
     author = {Terekhov, Arseniy and Khoroshev, Artyom and Azimov, Rustam and Grigorev, Semyon},
     year = {2020},
@@ -157,8 +180,7 @@
     doi = {10.1145/3398682.3399163}
 }
 
-https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html
-
+% Cuda toolkit reference
 @online{net:cuda_toolkit_docs,
     author       = "NVIDIA",
     title        = "CUDA Toolkit Documentation",
@@ -169,6 +191,7 @@ https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html
     language     = "english"
 }
 
+% Recursive state machines formalizm introduction
 @article{article:recursive_state_machines,
     author = {Alur, Rajeev and Benedikt, Michael and Etessami, Kousha and Godefroid, Patrice and Reps, Thomas and Yannakakis, Mihalis},
     title = {Analysis of Recursive State Machines},
@@ -189,6 +212,7 @@ https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html
     keywords = {pushdown automata, Software verification, recursive state machines, temporal logic, model checking, program analysis, context-free languages}
 }
 
+% Hopcroft formal languages theory
 @book{book:automata_theory,
     author = {Hopcroft, John E. and Motwani, Rajeev and Ullman, Jeffrey D.},
     title = {Introduction to Automata Theory, Languages, and Computation (3rd Edition)},
@@ -196,4 +220,81 @@ https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html
     isbn = {0321455363},
     publisher = {Addison-Wesley Longman Publishing Co., Inc.},
     address = {USA}
+}
+
+% Cfpq implementations becnch for Neo4j database
+@inproceedings{article:kuijpers_cfpq_exp_compare,
+    author = {Kuijpers, Jochem and Fletcher, George and Yakovets, Nikolay and Lindaaker, Tobias},
+    title = {An Experimental Study of Context-Free Path Query Evaluation Methods},
+    booktitle = {Proceedings of the 31st International Conference on Scientific and Statistical Database Management},
+    series = {SSDBM '19},
+    year = {2019},
+    isbn = {978-1-4503-6216-0},
+    location = {Santa Cruz, CA, USA},
+    pages = {121--132},
+    numpages = {12},
+    url = {http://doi.acm.org/10.1145/3335783.3335791},
+    doi = {10.1145/3335783.3335791},
+    acmid = {3335791},
+    publisher = {ACM},
+    address = {New York, NY, USA},
+} 
+
+% First introduction of cfpq problem
+@inproceedings{inproceedings:yannakakis_cfpq_problem,
+    author = {Yannakakis, Mihalis},
+    title = {Graph-Theoretic Methods in Database Theory},
+    year = {1990},
+    isbn = {0897913523},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    url = {https://doi.org/10.1145/298514.298576},
+    doi = {10.1145/298514.298576},
+    booktitle = {Proceedings of the Ninth ACM SIGACT-SIGMOD-SIGART Symposium on Principles of Database Systems},
+    pages = {230–242},
+    numpages = {13},
+    location = {Nashville, Tennessee, USA},
+    series = {PODS '90}
+}
+
+% Cfpq algo based on LR analysis (from 2019 Kujipers comp)
+@inbook{inbook:santos_cfpq_lr_analysis,
+    author = {Santos, Fred and Costa, Umberto and Musicante, Martin},
+    year = {2018},
+    month = {01},
+    pages = {225-233},
+    title = {A Bottom-Up Algorithm for Answering Context-Free Path Queries in Graph Databases},
+    isbn = {978-3-319-91661-3},
+    doi = {10.1007/978-3-319-91662-0_17}
+}
+
+% Simple rpq arrival algo for graph networks
+@inproceedings{10.1145/3299869.3319882,
+    author = {Wadhwa, Sarisht and Prasad, Anagh and Ranu, Sayan and Bagchi, Amitabha and Bedathur, Srikanta},
+    title = {Efficiently Answering Regular Simple Path Queries on Large Labeled Networks},
+    year = {2019},
+    isbn = {9781450356435},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    url = {https://doi.org/10.1145/3299869.3319882},
+    doi = {10.1145/3299869.3319882},
+    abstract = {A fundamental query in labeled graphs is to determine if there exists a path between a given source and target vertices, such that the path satisfies a given label constraint. One of the powerful forms of specifying label constraints is through regular expressions, and the resulting problem of reachability queries under regular simple paths (RSP) form the core of many practical graph query languages such as SPARQL from W3C, Cypher of Neo4J, Oracle's PGQL and LDBC's G-CORE. Despite its importance, since it is known that answering RSP queries is NP-Hard, there are no scalable and practical solutions for answering reachability with full-range of regular expressions as constraints. In this paper, we circumvent this computational bottleneck by designing a random-walk based sampling algorithm called ARRIVAL, which is backed by theoretical guarantees on its expected quality. Extensive experiments on billion-sized real graph datasets with thousands of labels show that ARRIVAL to be 100 times faster than baseline strategies with an average accuracy of 95%.},
+    booktitle = {Proceedings of the 2019 International Conference on Management of Data},
+    pages = {1463–1480},
+    numpages = {18},
+    keywords = {random walks, regular path query, knowledge graphs, regular expression, reachability query},
+    location = {Amsterdam, Netherlands},
+    series = {SIGMOD '19}
+}
+
+% RDF RPQ for Glushkov automata
+@article{article,
+    author = {Wang, Xin and Wang, Simiao and Xin, Yueqi and Yang, Yajun and Li, Jianxin and Wang, Xiaofei},
+    year = {2020},
+    month = {05},
+    pages = {},
+    title = {Distributed Pregel-based provenance-aware regular path query processing on RDF knowledge graphs},
+    volume = {23},
+    journal = {World Wide Web},
+    doi = {10.1007/s11280-019-00739-0}
 }
