@@ -183,7 +183,7 @@
     {\ifthenelse{\equal{\my@title@type@ru}{master}}
     {Магистерская диссертация}
     {\ifthenelse{\equal{\my@title@type@ru}{bachelor}}
-    {Бакалаврская работа}
+    {Выпускная квалификационная работа бакалавра}
     }}}
     \\}
     \vskip 2em
@@ -234,7 +234,7 @@
     \ifthenelse{\equal{\my@title@type@en}{coursework}}
     {Course Work}
     {\ifthenelse{\equal{\my@title@type@en}{diploma}}
-    {Graduation Thesis}
+    {Bachelor's Thesis}
     {\ifthenelse{\equal{\my@title@type@en}{master}}
     {Master's Thesis}
     {\ifthenelse{\equal{\my@title@type@en}{bachelor}}
