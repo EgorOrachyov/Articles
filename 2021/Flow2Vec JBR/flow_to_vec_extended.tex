@@ -127,6 +127,18 @@ JetBrains Research, Лаборатория языковых инструмент
     \end{itemize}
 \end{frame}
 
+\begin{frame}[fragile] \frametitle{Структура презентации}
+    \begin{itemize}
+        \item Code2vec: метод и его описание
+        \item Построение embedding'а для ориентированного графа
+        \item Запросы с контекстно-свободными (КС) ограничениями
+        \item Flow2vec: метод и его описание
+        \item Flow2vec: практическое применение
+        \item Наши исследования в области вычисления КС запросов
+        \item Дальнейшее направление исследований  
+    \end{itemize}
+\end{frame}
+
 \begin{frame}[fragile] \frametitle{Graph Embedding}
     \begin{itemize}
         \item Построение представления графа в векторном пространстве выбранной размерности
@@ -167,10 +179,10 @@ JetBrains Research, Лаборатория языковых инструмент
 \begin{frame}[fragile] \frametitle{Graph Embedding: Постановка задачи}
     \begin{itemize}
         \item Ориентированный граф $G = \langle V, E \rangle$, $V = \{ v_1, ... , v_N \}$, $|V| = N$, $e_{ij}=(v_1, v_2) \in E$
-        \item Матрица смежности графа $A$, $a_i$ - i-ая строка матрицы, $A_{ij}$ - элемент матрицы в i-ой строке и j-том столбце
+        \item Матрица смежности графа $A \in \mathbb{R}^{N \times N}$, $a_i$ - i-ая строка матрицы, $A_{ij}$ - элемент матрицы в i-ой строке и j-том столбце
         \item Матрица $S \in \mathbb{R}^{N \times N}$ - матрица близости графа
-        \item Embedding матрицы $U = [U^s, U^t]$, $U^s, U^t \in \mathbb{R}^{N \times K}$, $K$ - размерность emdedding'а, вектора $u^s_i, u^t_i$ соответсвуют вершине графа $v_i$
-        \item Хотим такое $U$, чтобы минимизировать потери $min \| S - U^s * {U^t}^T \|^2_F$ 
+        \item Embedding матрицы $U = [U^s, U^t]$, $U^s, U^t \in \mathbb{R}^{N \times K}$, $K \in \mathbb{N}$ - размерность emdedding'а, вектора $u^s_i, u^t_i$ соответсвуют вершине графа $v_i$
+        \item \textbf{Хотим приблизить матрицу $S$ оптимально в следующем смысле $min \| S - U^s * {U^t}^T \|^2_F$, где $\| \bullet \|_F$ - норма Фробениуса} 
     \end{itemize}
 \end{frame}
 
@@ -192,7 +204,7 @@ JetBrains Research, Лаборатория языковых инструмент
 
 \begin{frame}[fragile] \frametitle{Graph Embedding: Approximation of High-Order Proximity}
     \begin{itemize}
-        \item $S = S^{Katz} = \Sigma_{i=1}^{\infty} \beta^i A^i$
+        \item $S = S^{Katz} = \Sigma_{i=1}^{\infty} \beta^i A^i$, \\$S^{Katz} = \beta A * S^{Katz} + \beta * A$, $S^{Katz} = (I - \beta A)^{-1} * \beta A$
         \item $S = \Sigma_{i=1}^N \sigma_i v_i^s {v_i^t}^T$ используя SVD разложение, где $\{\sigma_1, ... , \sigma_N\}$ сингулярные значения в порядке убывания
         \item $U^s = [ \sqrt{\sigma_1} * v_1^s, ..., \sqrt{\sigma_K} * v_K^s ]$
         \item $U^t = [ \sqrt{\sigma_1} * v_1^t, ..., \sqrt{\sigma_K} * v_K^t ]$
@@ -211,19 +223,91 @@ JetBrains Research, Лаборатория языковых инструмент
 \end{frame}
 
 \begin{frame}[fragile] \frametitle{Context-free Path Querying}
-    
+    \begin{minipage}[m]{0.45\linewidth}
+        \begin{figure}
+            \centering
+            \includegraphics[width=0.8\textwidth]{pictures/hierarchical.pdf}
+            \caption{Example of a graph}
+        \end{figure}
+    \end{minipage}\hfill
+    \begin{minipage}[m]{0.55\linewidth}
+        \textbf{Навигация в графе:}
+        \begin{itemize}
+            \item Находятся ли вершины A и B на одном уровне иерархии?
+            \item Существует ли путь вида $\textbf{Up}^n \, \textbf{Down}^n$?
+            \item Найти все такие пути $\textbf{Up}^n \, \textbf{Down}^n$, которые начинаются в вершине~А
+        \end{itemize}
+    \end{minipage}
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{Context-free Path Querying: Применение}
+    \begin{itemize}
+        \item Графовые базы данных\footnote{Querying Graph Databases, Pablo Barceló Baeza,  \href{https://doi.org/10.1145/2463664.2465216}{https://doi.org/10.1145/2463664.2465216}}
+        \item Анализ RDF данных\footnote{Context-Free Path Queries on RDF Graphs, Xiaowang Zhang, Zhiyong Feng, Xin Wang et al., \href{https://arxiv.org/abs/1506.00743}{https://arxiv.org/abs/1506.00743}}
+        \item Биоинформатика\footnote{Quantifying variances in comparative RNA secondary structure prediction, James Anderson, Adám Novák, Zsuzsanna Sükösd et al., \href{https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-14-149}{https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-14-149}}
+        \item Статический анализ кода\footnote{Fast Algorithms for Dyck-CFL-Reachability with Applications to Alias Analysis, Qirun Zhang, Michael R. Lyu, Hao Yuan, Zhendong Su, \href{https://doi.org/10.1145/2499370.2462159}{https://doi.org/10.1145/2499370.2462159}}
+    \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile] \frametitle{Context-free Path Querying: Терминология}
-    
-\end{frame}
-
-\begin{frame}[fragile] \frametitle{Context-free Path Querying: Семантика Запросов}
-    
+    \begin{itemize}
+        \item Ориентированный граф с меткаи $\mathcal{G} = \langle V, E, L \rangle$
+        \item $\omega(\pi) = \omega(v_0 \xrightarrow{l_0} v_1 \xrightarrow{l_1} \cdots \xrightarrow{l_{n-2}} v_{n-1} \xrightarrow{l_{n-1}} v_n) = l_0 l_1 \cdots l_{n-1}$
+        \item КС Грамматика $G = \langle \Sigma, N, P, S \rangle$
+        \item Язык $L(G) = \{ w~|~S \rightarrow^*_G w \}$
+        \item Семантика достижимости: $R = \{ (u, v) ~|~ \exists u \pi v: \omega(\pi) \in L \}$
+        \item Семантика всех путей: $\Pi = \{ u \pi v ~|~ \omega(\pi) \in L \}$
+    \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile] \frametitle{Context-free Path Querying: Пример}
-    
+    \begin{minipage}[m]{\linewidth}
+        \begin{figure}
+           \centering
+            \begin{subfigure}[b]{0.4\textwidth}
+                \includegraphics[width=\textwidth]{figures/graph_cfpq_1.png}
+                \caption{input graph}
+            \end{subfigure}
+            \hfill
+            \begin{subfigure}[b]{0.4\textwidth}
+                \includegraphics[width=\textwidth]{figures/graph_cfpq_2.png}
+                \caption{Result graph}
+            \end{subfigure}
+            \caption{CFPQ Example}
+        \end{figure}
+    \end{minipage}\hfill
+    \begin{minipage}[m]{\linewidth}
+        \begin{itemize}
+            \item Грамматика $S \rightarrow aSb~|~ab$
+            \item Резульат (Семантика достижимости): ребра с меткой S
+            \item Резульат (Семантика всех путей): $\{1 \xrightarrow{a} 3, 0 \xrightarrow{a} 1 \xrightarrow{a} 2 \xrightarrow{b} 3 \xrightarrow{b} 2, 1 \xrightarrow{a} 2 \xrightarrow{a} 0 \xrightarrow{a} 1 \xrightarrow{a} 2 \xrightarrow{b} 3 \xrightarrow{b} 2 \xrightarrow{b} 3 \xrightarrow{b} 2, ...\}$
+        \end{itemize}
+    \end{minipage}
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{Context-free Path Querying: Существующие алгоритмы}
+    \begin{itemize}
+        \item Алгоритмы, основанные на различных техниках парсинга\\(CYK, LL, LR, etc.)
+        \item \textbf{Алгоритмы, основанные на линейной алгебре}
+        {
+            \begin{itemize}
+                \item Матричный алгоритм Рустама Азимова
+                \\- семантика: достижимости, одного пути, всех путей
+                \\- платформа: CPU, GPU
+                \item Алгоритм на основе пересечения графа и рекурсивного автомата через произведения Кронекера
+                \\- семантика: достижимости, одного пути, всех путей
+                \\- платформа: CPU, GPU
+            \end{itemize}
+        }
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{Context-free Path Querying: Итоги}
+    \begin{itemize}
+        \item Для анализа графа можем задавать запросы с КС ограничениями
+        \item Для каждой конкретной задачи можем выбирать различную семантику запроса
+        \item Имеем ээфективные алгоритмы для вычисления запросов на двух основных вычислительных платформах
+    \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile] \frametitle{Code Embedding: Предыстория}
