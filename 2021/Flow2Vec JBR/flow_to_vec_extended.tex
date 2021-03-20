@@ -139,7 +139,98 @@ JetBrains Research, Лаборатория языковых инструмент
     \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile] \frametitle{Graph Embedding}
+\begin{frame}[fragile] \frametitle{Code2vec: Code Embedding}
+    \begin{itemize}
+        \item Code2vec: построение code embeddings для представление фрагментов кода 
+        в виде числовых векторов фиксированной длины
+        \item Идея:
+        {
+            \begin{enumerate}
+                \item Представить фрагмент кода в виде абстрактного ситнаксического дерева
+                \item Сделать случайную выборку путей из дерева
+                \item Получить векторное представление путей
+                \item Суммировать полученные представления с весами и получить финальный вектор
+                \item Использовать данный вектор для анализа программы
+                \item Выполнять шаги 3 и 4 одновременно 
+            \end{enumerate}
+        }
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{Code2vec: Мотивационный пример}
+    \begin{minipage}[m]{\linewidth}
+        \begin{figure}
+            \centering
+            \includegraphics[width=\textwidth]{figures/code2vec_motivation_example.png}
+            \caption{An example for three methods that albeit having have a similar syntactic structure can be easily distinguished by our model; our model successfully captures the subtle differences between them and manages to predict meaningful names. Each method portrays the top-4 paths that were given the most attention by the model. The widths of the colored paths are proportional to the attention that each path was given.}
+        \end{figure}
+    \end{minipage}\hfill
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{Code2vec: Терминология}
+    \begin{itemize}
+        \item  Абстрактное синтаксическое дерево (АСТ) $\mathcal{C} = \langle N, T, X, s, \delta, \phi \rangle$, $\delta : N \rightarrow (N \cup T)^*$, $\phi : T \rightarrow X$
+        \item Путь в дереве $p = n_1 d_1 ... n_k d_k n_{k+1}$, $n_1, n_{k+1} \in T$, $n_2, ..., n_k \in N$, $d_i \in \{ \uparrow, \downarrow \}$
+        \item Путь-контекст $\langle x_s, p, x_t \rangle$, $x_s, x_t \in X$, $x_s = \phi(start(p))$, $x_t = \phi(end(p))$, для \textit{$x = 7$} путь-контекст $\langle x, NameExpr \uparrow AssignExpr \downarrow IntegerLiteralExpr, 7\rangle$
+        \item Множество меток Y, P множество АСТ путей, извлекаемых из датасета
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{Code2vec: Модель (1)}
+    \begin{itemize}
+        \item Что будем обучать:
+        {
+            \begin{itemize}
+                \item embedding путей $path\_vocab \in \mathbb{R}^{|P| \times d}$
+                \item embedding значений $value\_vocab \in \mathbb{R}^{|X| \times d}$
+                \item полносвязный слой $W \in \mathbb{R}^{d \times 3d}$
+                \item вектор внимания $\textbf{a} \in \mathbb{R}^d$
+                \item embedding меток $tags\_vocab \in \mathbb{R}^{|Y| \times d}$
+            \end{itemize}
+        }
+        \item Параметр $d \in \mathbb{N}$ - размерность embedding'а, подбирается эмпирически
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{Code2vec: Модель (2)}
+    \begin{minipage}[m]{\linewidth}
+        \begin{figure}
+            \centering
+            \includegraphics[width=0.8\textwidth]{figures/code2vec_model.png}
+            \caption{The architecture of our path-attention network. A full-connected layer learns to combine embeddings of each path-contexts with itself; attention weights are learned using the combined context vectors, and used to compute a code vector. The code vector is used to predicts the label.}
+        \end{figure}
+    \end{minipage}\hfill
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{Code2vec: Code as Bag of Path-Contexts}
+    \begin{itemize}
+        \item Множество всех путей P
+        \item Фрагмент кода $C = \langle N, T, X, s, \delta, \phi \rangle$
+        \item $T_{pairs} = \{ (t_i, t_j)~|~t_i, t_j \in termNodes(C), i \neq j\}$
+        \item $Rep = \{ \langle x_s, p, x_t \rangle ~|~ p \in P$ и $\exists (t_i, t_j) \in T_{pairs}:$ $start(p) = x_s, end(p) = x_t$, где $x_s = \phi(t_i), x_t = \phi(t_j) \}$
+        \item Мешок путей-контекстов $\mathcal{B} = \{ b_1, ... , b_n \}$, $b_i \in Rep$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{Code2vec: Path-Attention Model}
+    \begin{itemize}
+        \item Контекстный вектор $c_i = embedding(\langle x_s, p_j, x_t \rangle) = [value\_vocab_s, path\_vocab_j, value\_vocab_t] \in \mathbb{R}^{3d}$
+        \item Комбинированный контекстный вектор $tilde{c_i} = tanh(W * c_i) \in \mathbb{R}^d$
+        \item Веса внимания $\alpha_i = \frac{exp({c_i}^T \cdot \textbf{a})}{\Sigma_{j=1}^n exp({c_j}^T \cdot \textbf{a})}$
+        \item Вектор фрагмента кода $\textbf{v} = \Sigma_{i=1}^n \alpha_i \tilde{c_i}$
+        \item Предсказание $y_i \in Y, q(y) = \frac{exp(\textbf{v}^T \cdot \textit{tags\_vocab}_i)}{\Sigma_{i=1}^{|Y|} exp(\textbf{v}^T \cdot \textit{tags\_vocab}_j) }$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{Code2vec: Итоги}
+    \begin{itemize}
+        \item Можем представить пути в АСТ дереве фрагмента кода в виде набора векторов
+        \item Используя взвешенную сумму, можем представить весь фрагмент кода как вектор
+        \item Полученный вектор можем использовать в дальнейшем для анализа
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{HOPE: Graph Embedding}
     \begin{itemize}
         \item Построение представления графа в векторном пространстве выбранной размерности
         {
@@ -155,10 +246,11 @@ JetBrains Research, Лаборатория языковых инструмент
                 \item Реальные графы является ориентированными и обладают ассиметричной транзитивностью
             \end{itemize}
         }
+        \item Решение: Алгоритм High-Order Proximity preserved Embedding (HOPE)\footnote{Asymmetric Transitivity Preserving Graph Embedding, Mingdong Ou, Peng Cui, Jian Pei, Ziwei Zhang, and Wenwu Zhu, \href{https://doi.org/10.1145/2939672.2939751}{https://doi.org/10.1145/2939672.2939751}}
     \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile] \frametitle{Graph Embedding: Идея}
+\begin{frame}[fragile] \frametitle{HOPE: Идея}
     \begin{minipage}[m]{\linewidth}
         \begin{figure}
             \centering
@@ -176,7 +268,7 @@ JetBrains Research, Лаборатория языковых инструмент
     \end{minipage}\hfill
 \end{frame}
 
-\begin{frame}[fragile] \frametitle{Graph Embedding: Постановка задачи}
+\begin{frame}[fragile] \frametitle{HOPE: Постановка задачи}
     \begin{itemize}
         \item Ориентированный граф $G = \langle V, E \rangle$, $V = \{ v_1, ... , v_N \}$, $|V| = N$, $e_{ij}=(v_1, v_2) \in E$
         \item Матрица смежности графа $A \in \mathbb{R}^{N \times N}$, $a_i$ - i-ая строка матрицы, $A_{ij}$ - элемент матрицы в i-ой строке и j-том столбце
@@ -186,7 +278,7 @@ JetBrains Research, Лаборатория языковых инструмент
     \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile] \frametitle{Graph Embedding: High-order Proximity Matrix}
+\begin{frame}[fragile] \frametitle{HOPE: High-order Proximity Matrix}
     \begin{itemize}
         \item Построение матрицы близости $S$, которая сохранит "важные" свойства графа для дальнейшего анализа
         \item Варианты выбора $S$:
@@ -202,7 +294,7 @@ JetBrains Research, Лаборатория языковых инструмент
     \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile] \frametitle{Graph Embedding: Approximation of High-Order Proximity}
+\begin{frame}[fragile] \frametitle{HOPE: Approximation of High-Order Proximity}
     \begin{itemize}
         \item $S = S^{Katz} = \Sigma_{i=1}^{\infty} \beta^i A^i$, \\$S^{Katz} = \beta A * S^{Katz} + \beta * A$, $S^{Katz} = (I - \beta A)^{-1} * \beta A$
         \item $S = \Sigma_{i=1}^N \sigma_i v_i^s {v_i^t}^T$ используя SVD разложение, где $\{\sigma_1, ... , \sigma_N\}$ сингулярные значения в порядке убывания
@@ -213,7 +305,7 @@ JetBrains Research, Лаборатория языковых инструмент
     \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile] \frametitle{Graph Embedding: Итоги}
+\begin{frame}[fragile] \frametitle{HOPE: Итоги}
     \begin{itemize}
         \item Для ориентированного графа $G$ можем построить embedding, который сохраняет ассиметричную транзитивность графа
         \item Для построения требуется матрица близости высокого порядка $S$, которая сохраняет 
@@ -263,13 +355,13 @@ JetBrains Research, Лаборатория языковых инструмент
 \begin{frame}[fragile] \frametitle{Context-free Path Querying: Пример}
     \begin{minipage}[m]{\linewidth}
         \begin{figure}
-           \centering
-            \begin{subfigure}[b]{0.4\textwidth}
+            \centering
+            \begin{subfigure}[b]{0.35\textwidth}
                 \includegraphics[width=\textwidth]{figures/graph_cfpq_1.png}
-                \caption{input graph}
+                \caption{Input graph}
             \end{subfigure}
             \hfill
-            \begin{subfigure}[b]{0.4\textwidth}
+            \begin{subfigure}[b]{0.35\textwidth}
                 \includegraphics[width=\textwidth]{figures/graph_cfpq_2.png}
                 \caption{Result graph}
             \end{subfigure}
@@ -310,21 +402,6 @@ JetBrains Research, Лаборатория языковых инструмент
     \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile] \frametitle{Code Embedding: Предыстория}
-    \begin{itemize}
-        \item Развитие техник embedding'а в области обработки и анализа естественных языков (word2vec, и т.д.)
-        \item Развитие техник code embedding'а для построения представления программ (code2vec, и т.д.)
-    \end{itemize}
-\end{frame}
-
-\begin{frame}[fragile] \frametitle{Code Embedding: Мотивация}
-    \begin{itemize}
-        \item Развитие техник embedding'а в обрабокте естественных языков
-        \item Code embedding'и в качестве представления программ
-        \item Методы машинного обучения для анализа программ по новому представлению
-    \end{itemize}
-\end{frame}
-
 \begin{frame}[fragile] \frametitle{Code Embedding: Проблемы}
     \begin{minipage}[m]{\linewidth}
         \begin{figure}
@@ -342,32 +419,28 @@ JetBrains Research, Лаборатория языковых инструмент
         \end{figure}
     \end{minipage}\hfill
     \begin{minipage}[m]{\linewidth}
+        Недостатки существующих интсрументов:
         \begin{itemize}
-        \item Существующие интсрументы
-            {
-            \begin{itemize}
-                \item Code2vec
-                \item Code2seq
-                \item Word2vec-like ...
-            \end{itemize}
-            }
-            \item Недостатки
-            {
-            \begin{itemize}
-                \item Не учитывают меж-процедурное взаимодействие
-                \item Не учитывают псевдонимы (ссылки)
-                \item Не учитывают ассиметричную транзитивность программ
-            \end{itemize}
-            }
+            \item Не учитывют межпроцедурное взаимодействие
+            \item Не учитывют псевдонимы (ссылки)
+            \item Не учитывют ассиметричную транзитивность программ
         \end{itemize}
     \end{minipage}
 \end{frame}
 
-\begin{frame}[fragile] \frametitle{Flow2Vec}
+\begin{frame}[fragile] \frametitle{Flow2Vec: Value-Flow-Based Precise Code Embedding}
     \begin{itemize}
-            \item Новый алгоритм, предложенный в статье \textit{Flow2Vec: Value-Flow-Based Precise Code Embedding}\footnote{Ссылка: \href{https://dl.acm.org/doi/10.1145/3428301}{https://dl.acm.org/doi/10.1145/3428301}} 
-            \item Учитывает ранее указанные недостатки
-            \item Использует Intermediate Representation (IR), Interprocedural Value-Flow Graph (IVFG) и  CFPQ для построяния value-flow reachability матриц
+            \item Flow2vec: построение code embeddings для представления фрагмента кода как части всей программы с учетом межпроцедурных потоков данных и множества вызовов функций
+            \item Идея:
+            {
+                \begin{enumerate}
+                    \item Построить промежуточное представление программы в терминах простых операций
+                    \item Построить граф потоков данных
+                    \item Используя КС запросы вычислить количество потоков данных между каждым выражение в программе (в ее промежуточном представлении)
+                    \item Построить матрицу близости высокого порядка
+                    \item Вычислить на ее основе embedding для графа программы
+                \end{enumerate}
+            }
         \end{itemize}
 \end{frame}
 
@@ -375,16 +448,16 @@ JetBrains Research, Лаборатория языковых инструмент
     \begin{minipage}[m]{\linewidth}
         \begin{figure}
             \centering
-            \includegraphics[width=0.8\textwidth]{figures/flow2vec_idea.png}
+            \includegraphics[width=0.9\textwidth]{figures/flow2vec_idea.png}
             \caption{Flow2vec idea}
             \label{fig:flow2vec_idea}
         \end{figure}
     \end{minipage}\hfill
     \begin{minipage}[m]{\linewidth}
         \begin{itemize}
-            \item Шаг 1: Построение IR, IVFG, исходных матриц с call/return и value-flow информацией
+            \item Шаг 1: Построение LLVM-IR, IVFG, исходных матриц с call/return и value-flow информацией
             \item Шаг 2: Value-flow reachability через CFPQ
-            \item Шаг 3: Построение emdedding'а высокого порядка
+            \item Шаг 3: Вычисление матрицы близости высокого порядка и построение emdedding'а
             \item Шаг 4: Применение построенного emdedding'а в пользовательских приложениях
         \end{itemize}
     \end{minipage}
