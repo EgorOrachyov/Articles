@@ -79,7 +79,7 @@
 %% Отступ в первом абзаце
 \usepackage{indentfirst}
 %% Гиперссылки
-\usepackage[colorlinks=true,urlcolor=blue,linkcolor=black,filecolor=black,citecolor=black]{hyperref}
+\usepackage[colorlinks=false,urlcolor=blue,linkcolor=black,filecolor=black,citecolor=black]{hyperref}
 
 %% Включение графических файлов
 %% we don't need to load graphicx since it will be loaded by xunicode (which is loaded by fontspec) 
