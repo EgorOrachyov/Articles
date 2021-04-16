@@ -319,16 +319,42 @@
     keywords = {Graph algorithms, GraphBLAS, sparse matrices}
 }
 
+% cuSPARSE reference
+@MISC{net:cusparse_docs,
+  title = {Sparse  matrix  library  (in  Cuda)},
+  url = {https://docs.nvidia.com/cuda/cusparse/},
+  urldate      = "16.04.2021",
+  language     = "english"
+}
 
-% CuSPARSE reference
-@online{net:cusparse_docs,
-    author       = "NVIDIA",
-    title        = "cuSPARSE reference guide",
-    howpublished = "NVIDIA Developer Zone",
-    year         = 2020,
-    url          = {https://docs.nvidia.com/cuda/cusparse/index.html},
-    urldate      = "09.12.2020",
-    language     = "english"
+% bhSPARSE
+@article{10.1016/j.jpdc.2015.06.010,
+ author = {Liu, Weifeng and Vinter, Brian},
+ title = {A Framework for General Sparse Matrix-Matrix Multiplication on GPUs and Heterogeneous Processors},
+ year = {2015},
+ issue_date = {November 2015},
+ publisher = {Academic Press, Inc.},
+ address = {USA},
+ volume = {85},
+ number = {C},
+ issn = {0743-7315},
+ url = {https://doi.org/10.1016/j.jpdc.2015.06.010},
+ doi = {10.1016/j.jpdc.2015.06.010},
+ abstract = {General sparse matrix-matrix multiplication (SpGEMM) is a fundamental building block for numerous applications such as algebraic multigrid method (AMG), breadth first search and shortest path problem. Compared to other sparse BLAS routines, an efficient parallel SpGEMM implementation has to handle extra irregularity from three aspects: (1) the number of nonzero entries in the resulting sparse matrix is unknown in advance, (2) very expensive parallel insert operations at random positions in the resulting sparse matrix dominate the execution time, and (3) load balancing must account for sparse data in both input matrices.In this work we propose a framework for SpGEMM on GPUs and emerging CPU-GPU heterogeneous processors. This framework particularly focuses on the above three problems. Memory pre-allocation for the resulting matrix is organized by a hybrid method that saves a large amount of global memory space and efficiently utilizes the very limited on-chip scratchpad memory. Parallel insert operations of the nonzero entries are implemented through the GPU merge path algorithm that is experimentally found to be the fastest GPU merge approach. Load balancing builds on the number of necessary arithmetic operations on the nonzero entries and is guaranteed in all stages.Compared with the state-of-the-art CPU and GPU SpGEMM methods, our approach delivers excellent absolute performance and relative speedups on various benchmarks multiplying matrices with diverse sparsity structures. Furthermore, on heterogeneous processors, our SpGEMM approach achieves higher throughput by using re-allocatable shared virtual memory. We design a framework for SpGEMM on modern manycore processors using the CSR format.We present a hybrid method for pre-allocating the resulting sparse matrix.We propose an efficient parallel insert method for long rows of the resulting matrix.We develop a heuristic-based load balancing strategy.Our approach significantly outperforms other known CPU and GPU SpGEMM methods.},
+ journal = {J. Parallel Distrib. Comput.},
+ month = nov,
+ pages = {47--61},
+ numpages = {15},
+ keywords = {Linear algebra, Sparse matrix, Sparse matrix-matrix multiplication, Heterogeneous processor, GPU, Merging, Parallel algorithm}
+}
+
+% Graphblast
+@article{yang2019graphblast,
+  title = {{GraphBLAST}: A High-Performance Linear Algebra-based Graph Framework on the {GPU}},
+  author = {Carl Yang and Ayd{\i}n Bulu{\c{c}} and John D. Owens},
+  year = {2019},
+  journal = {arXiv preprint},
+  arxiv = {https://arxiv.org/abs/1908.01407}
 }
 
 % Cusplibrary project
@@ -537,4 +563,25 @@ month={Sep.},}
  publisher = {ACM},
  address = {New York, NY, USA},
  keywords = {CFL reachability, alias analysis, demand-driven analysis, memory disambiguation, pointer analysis},
+}
+
+% Alias analysis grammar
+@article{10.1145/3093336.3037744,
+ author = {Wang, Kai and Hussain, Aftab and Zuo, Zhiqiang and Xu, Guoqing and Amiri Sani, Ardalan},
+ title = {Graspan: A Single-Machine Disk-Based Graph System for Interprocedural Static Analyses of Large-Scale Systems Code},
+ year = {2017},
+ issue_date = {April 2017},
+ publisher = {Association for Computing Machinery},
+ address = {New York, NY, USA},
+ volume = {52},
+ number = {4},
+ issn = {0362-1340},
+ url = {https://doi.org/10.1145/3093336.3037744},
+ doi = {10.1145/3093336.3037744},
+ abstract = {There is more than a decade-long history of using static analysis to find bugs in systems such as Linux. Most of the existing static analyses developed for these systems are simple checkers that find bugs based on pattern matching. Despite the presence of many sophisticated interprocedural analyses, few of them have been employed to improve checkers for systems code due to their complex implementations and poor scalability. In this paper, we revisit the scalability problem of interprocedural static analysis from a "Big Data" perspective. That is, we turn sophisticated code analysis into Big Data analytics and leverage novel data processing techniques to solve this traditional programming language problem. We develop Graspan, a disk-based parallel graph system that uses an edge-pair centric computation model to compute dynamic transitive closures on very large program graphs.We implement context-sensitive pointer/alias and dataflow analyses on Graspan. An evaluation of these analyses on large codebases such as Linux shows that their Graspan implementations scale to millions of lines of code and are much simpler than their original implementations. Moreover, we show that these analyses can be used to augment the existing checkers; these augmented checkers uncovered 132 new NULL pointer bugs and 1308 unnecessary NULL tests in Linux 4.4.0-rc5, PostgreSQL 8.3.9, and Apache httpd 2.2.18.},
+ journal = {SIGPLAN Not.},
+ month = apr,
+ pages = {389--404},
+ numpages = {16},
+ keywords = {disk-based systems, static analysis, graph processing}
 }
