@@ -1,5 +1,5 @@
 %20 min preso!
-\documentclass[xcolor=table,english]{beamer}
+\documentclass[aspectratio=169,xcolor=table,english]{beamer}
 \usepackage{beamerthemesplit}
 \usepackage{wrapfig}
 \usetheme{SPbGU}
@@ -66,8 +66,8 @@
 }
 
 % То, что в квадратных скобках, отображается в левом нижнем углу (прикольно).
-\author[Егор Орачев]{Орачев Егор Станиславович, 17.Б11-мм \\Научный руководитель: доцент кафедры информатики,\\ к.ф.-м.н. С.В. Григорьев\\Рецензент: разработчик биоинформатического ПО,\\ ЗАО “БИОКАД” А.С. Хорошев}
-\date{10 апреля 2021}
+\author[Егор Орачев]{Орачев Егор Станиславович, 17.Б11-мм \\Научный руководитель: доцент кафедры информатики, к.ф.-м.н. С.В. Григорьев\\Рецензент: разработчик биоинформатического ПО, ЗАО “БИОКАД” А.С. Хорошев}
+\date{29 апреля 2021}
 
 
 \begin{document}
@@ -90,7 +90,7 @@
 }
 
 \begin{frame}[fragile] \frametitle{Введение}
-    \begin{minipage}[m]{0.5\linewidth}
+    \begin{minipage}[m]{0.6\linewidth}
         \begin{figure}
             \centering
             \includegraphics[width=\textwidth]{figures/db_example.png}
@@ -98,7 +98,7 @@
             \label{fig:architecture}
         \end{figure}
     \end{minipage}\hfill
-    \begin{minipage}[m]{0.5\linewidth}
+    \begin{minipage}[m]{0.4\linewidth}
         \begin{itemize}
             \item Графовая модель данных
             \item Графовые базы данных
@@ -116,11 +116,12 @@
             \caption{Пример графа}
         \end{figure}
     \end{minipage}\hfill
-    \begin{minipage}[m]{0.55\linewidth}
+    \begin{minipage}[m]{0.5\linewidth}
         \begin{itemize}
             \item Мотивация: навигация в графе
             \item Пример: находятся ли вершины A и B на одном уровне иерархии?
             \item Применение: анализ RDF данных, биоинформатика, статический анализ кода
+            \item Проблема: отсутствие поддержки КС запросов как в современных СУБД, так и в отдельных инструментах
         \end{itemize}
   \end{minipage}
 \end{frame}
@@ -167,7 +168,7 @@
     \begin{minipage}[m]{\linewidth}
         \begin{figure}
             \centering
-            \includegraphics[width=0.52\textwidth]{figures/library_architecture.png}
+            \includegraphics[width=0.4\textwidth]{figures/library_architecture.png}
             \caption{Архитектура разработанной библиотеки}
         \end{figure}
     \end{minipage}\hfill    
@@ -179,7 +180,7 @@
     \begin{minipage}[m]{0.85\linewidth}
         \begin{figure}
             \centering
-            \includegraphics[width=0.85\textwidth]{figures/library_call_flow.png}
+            \includegraphics[width=0.65\textwidth]{figures/library_call_flow.png}
             \caption{Последовательность выполнения вычислительной матричной операции на Nvidia GPU с использованием pycubool}
         \end{figure}
     \end{minipage}\hfill    
@@ -188,8 +189,8 @@
 
 \begin{frame}[fragile] \frametitle{Детали реализации}
     \begin{itemize}
-        \item C, C++, CUDA C++, Python
-        \item Разреженная матрица булевых значений формате CSR
+        \item C, C++, CUDA C/C++, Python
+        \item Разреженная матрица булевых значений хранится формате CSR
         \item Размер в памяти $\textit{sizeof(unsigned int)} * (\textit{rows} + 1 + \textit{nvals})$
         \item Операции: 
         {
@@ -219,7 +220,7 @@
 
 \begin{frame}[fragile] \frametitle{Пример использования Python API}
     \begin{center}
-     \begin{minipage}[m]{0.915\linewidth}
+     \begin{minipage}[m]{0.9\linewidth}
         \begin{figure}
             \centering
             \includegraphics[width=\textwidth]{figures/tc_python_api.png}
@@ -232,10 +233,22 @@
 \begin{frame}[fragile] \frametitle{Алгоритм поиска путей с КС ограничениями через тензорное произведение}
     \begin{itemize}
         \item Алгоритм реализован с использованием разработанного пакета pycubool
-        \item Реализация доступна в рамках проекта PyAlgo-CFPQ
+        \item Реализация доступна в рамках проекта CFPQ-PyAlgo
         \item Вход: ориентированный граф с метками на ребрах и КС грамматика в виде рекурсивного автомата
         \item Выход: матрица достижимости, а также индекс для восстановления всех пути в графе соответствии с входной грамматикой
     \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{Инфраструктура CFPQ-PyAlgo}
+    \begin{center}
+     \begin{minipage}[m]{0.65\linewidth}
+        \begin{figure}
+            \centering
+            \includegraphics[width=\textwidth]{figures/cfpq_py_algo.png}
+            \caption{Архитектура CFPQ-PyAlgo стенда для тестирования алгоритмов}
+        \end{figure}
+    \end{minipage}\hfill   
+    \end{center}
 \end{frame}
 
 \begin{frame}[fragile] \frametitle{Экспериментальное исследование}
@@ -253,7 +266,7 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile] \frametitle{Набор данных}
+\begin{frame}[fragile] \frametitle{В1: Набор данных}
     \begin{center}
      \begin{minipage}[m]{0.9\linewidth}
         \begin{figure}
@@ -265,25 +278,80 @@
     \end{center}
 \end{frame}
 
-\begin{frame}[fragile] \frametitle{Матричное умножение}
+\begin{frame}[fragile] \frametitle{В1: Матричное умножение}
     \begin{center}
-     \begin{minipage}[m]{0.93\linewidth}
+     \begin{minipage}[m]{0.85\linewidth}
         \begin{figure}
             \centering
-            \includegraphics[width=0.9\textwidth]{figures/results_1_rq1.png}
+            \includegraphics[width=1.0\textwidth]{figures/results_1_rq1.png}
             \caption{Матричное умножение, время (t) в миллисекундах, память (m) в мегабайтах, отклонение в пределах 10\%}
         \end{figure}
     \end{minipage}\hfill   
     \end{center}
 \end{frame}
 
-\begin{frame}[fragile] \frametitle{Поэлементное матричное сложение}
+\begin{frame}[fragile] \frametitle{В1: Поэлементное матричное сложение}
     \begin{center}
-     \begin{minipage}[m]{0.93\linewidth}
+     \begin{minipage}[m]{0.85\linewidth}
         \begin{figure}
             \centering
-            \includegraphics[width=0.9\textwidth]{figures/results_2_rq1.png}
+            \includegraphics[width=1.0\textwidth]{figures/results_2_rq1.png}
             \caption{Поэлементное матричное сложение, время (t) в миллисекундах, память (m) в мегабайтах, отклонение в пределах 10\%}
+        \end{figure}
+    \end{minipage}\hfill   
+    \end{center}
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{В2: Набор данных}
+    \begin{center}
+     \begin{minipage}[m]{0.9\linewidth}
+        \begin{figure}
+            \centering
+            \includegraphics[width=1.0\textwidth]{figures/dataset_rq2.png}
+            \caption{RDF графы и графы программ для экспериментов}
+        \end{figure}
+    \end{minipage}\hfill   
+    \end{center}
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{В2: Запросы с КС ограничениями}
+    \begin{center}
+     \begin{minipage}[m]{0.85\linewidth}
+        \begin{figure}
+            \centering
+            \includegraphics[width=0.65\textwidth]{figures/cfpq_query_rq2.png}
+            \caption{КС грамматики запросов для анализа. Запросы, для анализа RDF данных: $G_1$ (1), $G_2$ (2), $G_{geo}$ (3), для анализа указателей в графах программ --- $G_{ma}$ (4).}
+        \end{figure}
+    \end{minipage}\hfill   
+    \end{center}
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{В2: Анализ RDF данных}
+    \begin{center}
+     \begin{minipage}[m]{0.9\linewidth}
+        \begin{figure}
+            \centering
+            \includegraphics[width=1.0\textwidth]{figures/results_1_rq2.png}
+            \caption{Анализ RDF данных с использованием запросов $G_1$ и $G_2$, время (t) в секундах, память (m) в мегабайтах, отклонение в пределах 10\%}
+        \end{figure}
+    \end{minipage}\hfill   
+    \begin{minipage}[m]{0.9\linewidth}
+        \begin{figure}
+            \centering
+            \includegraphics[width=0.6\textwidth]{figures/results_2_rq2.png}
+            \caption{Анализ RDF данных с использованием запроса $G_{geo}$, время (t) в секундах, память (m) в мегабайтах, отклонение в пределах 10\%}
+        \end{figure}
+    \end{minipage}
+    \end{center}
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{В2: Анализ указателей}
+    \begin{center}
+     \begin{minipage}[m]{0.9\linewidth}
+        \begin{figure}
+            \centering
+            \includegraphics[width=0.7\textwidth]{figures/results_3_rq2.png}
+            \caption{Анализ указателей с использованием запроса $G_{ma}$, время (t) в секундах, память (m) в мегабайтах, отклонение в пределах 10\%}
         \end{figure}
     \end{minipage}\hfill   
     \end{center}
@@ -292,11 +360,11 @@
 \begin{frame}[fragile] \frametitle{Заключение}
     \begin{itemize}
         \item Спроектирована библиотека примитивов линейной булевой алгебры для работы с разреженными данными на GPGPU
-        \item Реализована библиотека cuBool\footnote{cuBool: \url{https://github.com/JetBrains-Research/cuBool},\\pycubool: \url{https://test.pypi.org/project/pycubool/}} в соответствии с разработанной архитектурой
+        \item Реализована библиотека cuBool\footnote{GitHub cuBool: \url{https://github.com/JetBrains-Research/cuBool}} в соответствии с разработанной архитектурой, опубликован соответствующий python-пакет\footnote{PyPI pycubool: \url{https://test.pypi.org/project/pycubool/}} 
         \item С использованием pycubool реализован алгоритм поиска путей с КС ограничениями через тензорное произведение
-        \item \textcolor{red}{Выполнено экспериментальное исследование полученных артефактов}
+        \item Выполнено экспериментальное исследование полученных артефактов
         \break
-        \item  Результаты исследования были представлены на конференции GrAPL 2021\footnote{GrAPL 2021: Workshop on Graphs, Architectures, Programming, and Learning. Дата обращения: 1.04.2021. Сайт конференции: \url{https://hpc.pnl.gov/grapl/}.}
+        \item  Результаты исследования были представлены на конференции GrAPL 2021\footnote{GrAPL 2021: Workshop on Graphs, Architectures, Programming, and Learning. Сайт конференции: \url{https://hpc.pnl.gov/grapl/}.}
     \end{itemize}
 \end{frame}
 
