@@ -1,0 +1,25 @@
+\section*{Introduction}
+
+Graph model is a natural way to structure data in a number of a real practical tasks, such as databases queries evaluations~\cite{article:querying_graph_databases}, graph databases~\cite{paper:redisgraph}, social networks analysis~\cite{article:facebook_large_scale}, RDF data analysis~\cite{article:cfpq_and_rdf_analysis}, bioinformatics~\cite{article:rna_prediction} and static code analysis~\cite{article:dyck_cfl_code_analysis}. 
+
+In the graph model the entity is represented as a graph vertex. Relations between entities are directed labeled edge. Such a model allows to model the domain of the analysis with a little effort, saving complex relationships between objects. What is not easy and clear to do, for example, in a classic \textit{relational} model, based on tables.
+
+There is a number of real-world practical graphs for analysis, which have sparse structure, where the number of edges has the same order as the number of vertices. Thus, for practical analysis specialized tools are required. These tools must provide efficient data layout in memory. Since a graph can count tens and hundreds millions edges~\cite{article:facebook_large_scale}, such tools must provide parallel processing possibility with utilization of multiple computational units or of specialized acceleration device.
+
+In the last decade the research community have published a number of works, which covers the topic of efficient graph data analyse. It is worth to mentions such tools as Gunrock~\cite{article:gunrock}, Ligra~\cite{article:ligra}, GraphBLAST~\cite{yang2019graphblast}, SuiteSparse~\cite{article:suite_sparse_for_graph_problems}, etc. Existing solutions provide different execution strategies and models, use for acceleration GPUs or multi-core CPUs.
+
+According to Yang et al.~\cite{yang2019graphblast} and Orachev et al.~\cite{net:cubool_project}, a graphics processing unit usage is a promising way to a high-performance graph data analysis. However, practical algorithms' implementation, as well as development of a libraries for a graph data analysis, is a non-trivial task. Reasons for this problem are the following.
+
+\begin{itemize}
+    \item \textbf{Complex APIs}. Frameworks for GPU programming, such as Nvidia CUDA or OpenCL, have a low-level nature. These are verbose APIs, which requires a lot of auxiliary operations, as well as careful management of resources and synchronization points. What makes then inaccessible of an ordinary programmer or data analyst.
+    
+    \item \textbf{Different algorithms}. Graph algorithms have similar structure, but differ in details. It requires \textit{ad hoc} tuning for each algorithm instance with utilization of local optimizations. What makes these solution less reusable and forces to implement each algorithm from scratch.
+    
+    \item \textbf{Workload imbalance}. Multi-core CPUs and GPUs require even work distribution for better computational blocks occupation. What is not a trivial tasks due to sparsity of analysed data.
+    
+    \item \textbf{Irregular access patterns}. In general, graph algorithms has high memory-access and low computational (arithmetic) intensity. Thus, the memory access can be a bottleneck. Therefore, specialized data structures must be utilized.
+\end{itemize}
+
+In order to solve the mentioned above issues, the research community suggested a promising concept, which relies on a sparse linear algebra for a graph algorithms expression. This is a GraphBLAS~\cite{paper:graphblas_foundations} standard. This standard provides C API, allows to express graph algorithms as set of operations over vectors and matrices. Efficient implementation of these primitives and operations allows one to get a ready for usage implementation of an algorithms, without a deep knowledge of a low-level programming.
+
+There is a number of GraphBLAS implementations and works, inspired by its ideas. However, there is still no implementation of GraphBLAS for a wide class of graphics processing units, since existing implementations focus on CPUs or Nvidia GPUs only, missing Intel and AMD devices. Also, existing tools are a bit limited in the performance and in a customization of operations. Thus, it is an import tasks of a sparse linear algebra primitives and operations library implementation, with support for generalization of operations for used defined types, as well as with support for computations on GPUs.

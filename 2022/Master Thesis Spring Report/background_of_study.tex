@@ -1,0 +1,127 @@
+\section{Background of study}
+
+This work is related to three major topics: graph analysis, sparse linear algebra and GPU computations. This section gives an overview for this topics, as well provides a survey of existing solutions and gives a brief introduction to a GPU programming.
+
+\subsection{Related work}
+
+Large-scale graph processing frameworks for multi-core CPUs, distributed memory CPUs systems, and GPUs, accordingly to a Batari et al.~\cite{article:batarfi_survey_graphs} and Shi et al.~\cite{article:shi_survey_graphs} survey, can be classified into following categories.\\
+
+\textbf{Vertex-centric}. Vertex-centric model is based on a parallel processing of a graph vertices. It is introduces in Pregel~\cite{article:pregel} framework. This framework has a similar to a \textit{map-reduce} concept and message passing. The whole processing is divided into a number of iterative step. In the beginning, all vertices are active. The the superstep of processing occurs. After this step, the runtime collects messages from all vertices, and determines vertices for the next superstep. Supersteps are synchronized in the way, that the next step is started only after previous one is completed. The significant drawback of this model is that these synchronization points introduce GPU overhead. So, some GPU blocks can be stalled, while others are still working.\\   
+
+\textbf{Edge-centric}. Edge-centric model focuses on edges processing rather then vertices. It is first introduced in X-Stream~\cite{article:xstream} project. This model streams sequentially edges of the graphs, allows to effectively process them. However, it suffers from a random access patters, when access to the vertices is required. Sequential access pattern to edges can be important, when data is loaded from the hard or solid state driver.\\
+
+\textbf{Linear-algebra based}. Linear algebra based frameworks for a graph processing originate from a CombinationalBLAS~\cite{article:combblas} project, which introduced primitives for a large graph data analysis for a distributed memory CPU systems. 
+
+Linear algebra approach relies on the fact, that the graph traversal can be represented as matrix-vector multiplication as shown in figure~\ref{fig:gt_mxv}. The graph is stored in an adjacency matrix $A$. The set of active vertices, also called \textit{frontier}, is represented as a vector $v$, with non-zero elements for vertices of the front. Transposed matrix $A$ multiplied by a vector $v$ on the right gives a new frontier with active vertices for the next iteration. In order to traverse all vertices only once, we have to store additional vector with visited vertices. This vector can be used in an inverse element-wise multiplication to filter out those vertices from the frontier, which are already visited. 
+
+This is a fundamental concept, which is lying in the most graph traversal based algorithms, such as breadth-first search or single source shortest paths. This method can be extended even further if we consider a multiple-source traversal. In this we have a number of frontier vectors, which can be stored as a matrix. It allows us use matrix-matrix product for a such task.
+
+The graph analysis community has formalized this method in a GraphBLAS~\cite{paper:graphblas_foundations} standard, which provides linear algebra primitives in a form of C API. This standard has a number of implementations, including the first reference implementation SuiteSparse~\cite{article:suite_sparse_for_graph_problems}, GrapbBLAS template library GBTL~\cite{article:gbtl}, Huawei GraphBLAS implementation~\cite{article:hu_graphblas_impl}, etc.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/graph_traversal_mxv.png}
+    \caption{Graph traversal by matrix-vector product.}
+    \label{fig:gt_mxv}
+\end{figure}
+
+\subsection{GraphBLAS concepts}
+
+GraphBLAS standard~\cite{paper:graphblas_foundations} is a mathematical notation translated into a C API. This standard provides sparse linear algebra build blocks for the implementation of graph algorithms in term of matrix and vector operations. The essential parts of this standards are the following.\\
+
+\textbf{Data containers}. Primary data containers in this standard are general M by N matrix and M vector of values, as well as a scalar value. Containers are parameterised by the type of stored elements. The standard provides the ability to declare custom user defined types. 
+
+Matrix is used to represent the adjacency matrix of the graph. Vector is used to store a set of active vertices for traversal purposes. The scalar value is used to extract edge data from the graph or to aggregate the data across multiple edges.\\
+
+\textbf{Algebraic structure}. Primary algebraic structures are called semiring and monoid, where two or one operation is provided respectively with some semantic requirements, such as associativity, commutativity, etc. This structures are adapted for a sparse graph analysis, so its mathematical properties differ a bit from those, which are stated in class algebra.
+
+This structures define the element-wise operations, which work with elements in the containers. For example, they are passed as a parameters \textit{mult} and \textit{add} in the matrix product, where elements for row and column are multiplied, and then reduced to the final element.
+
+There is a number of semirings, which can be used to solve different types of problems. For example, consider \textit{MinPlus} semiring $\langle min, +, \mathbb{R} \cup \{+\infty\}, +\infty \rangle$, for a shortest path problem solving, where:
+
+\begin{itemize}
+    \item Min used to aggregate distances and select the smallest one.
+    \item Plus used to concatenate distances between two vertices.
+    \item The domain is all real values with plus infinity.
+    \item The identity element is infinity, what marks unreached vertices.
+\end{itemize}
+
+\textbf{Programming constructs}. GraphBLAS provides extra objects, which are required for practical algorithms implementation. One of the is a concept of the mask. Any matrix or vector can be used as a mask, which structure defines the structure of the result. It is a crucial and essential concept, since in many cases we are interested only in a partial result, not the whole matrix or vector. Mask is passed as extra argument, and implementation is free to make the fusion of the mask into the operation.
+
+Another important construct is a descriptor. Descriptor is a set of named parameters and associated with them values. Descriptor used to tell the implementation, that, for example, mask complementary patter required, or result must not be accumulated with old content. This concept can be extended further, what is done in some GraphBLAS extensions.\\
+
+\textbf{Operations.} GraphBLAS provides a number of commonly used linear algebra operations, such as matrix-vector and matrix-matrix products, transpose, element-wise multiplication. Also, there are some extra operations, which are more familiar for experienced developers, such as filtering, selection using predicate, reduction of matrix to vector or of vector to scalar, etc.
+
+The important concept of the GraphBLAS operations is shown in the figure~\ref{fig:gb_ops}. For example, we can consider matrix-vector and matrix-matrix product operations, called \textit{mxv} and \textit{mxm} respectively. From the users perspective, they only have to use these operations, when the implementation is free to select the best algorithm, which fits the sparsity of the input arguments. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.0\textwidth]{images/types_of_operations.png}
+    \caption{Key operations of the GraphBLAS standard and their implementations.}
+    \label{fig:gb_ops}
+\end{figure}
+
+\subsection{Existing frameworks}
+
+There is a number of libraries and frameworks for a graph data analysis on multi-core CPUs and GPUs. Some of them implement the GraphBLAS standard. Also, there are some works, which are inspired by the standard idea to utilize sparse linear algebra apparatus of data analysis. It this section the most significant contribution of the research community is covered.\\
+
+\textbf{Gunrock}. Gunrock~\cite{article:gunrock} is a state-of-the-art Nvidia GPU high level graph analytical system with support for both vertex-centric and edge-centric processing. It provides fine-grained runtime load balancing, does not requires any preprocessing of the input data, supports multi-GPU execution. Gunrock is written using Nvidia Cuda C++. It provides template based model for particular algorithms specializations. 
+
+Authors claim, that this framework is high-level from particular algorithms implementation perspective. However, it requires the knowledge of the Cuda API in order to extend this framework primitives for a new algorithm. Also, this framework utilizes a number of ad hoc optimizations. So it is limited in it a generalization.\\
+
+\textbf{SuiteSparse}. GraphBLAS SuiteSprase~\cite{article:suite_sparse_for_graph_problems} is a reference fully featured GraphBLAS implementation for mutli-core CPU computations. It is written using C language and OpenMP. Library is fully compatible with GraphBLAS API standard. It is available for C and C++ programs usage. Also, it provides a number of officially and unofficially supported packages, which export the functionality into other runtime, such as Java or Python (via pygraphblas~\cite{net:pygraphblas}).
+
+At this moment, the work is done in the project in order to support Nvidia Cuda for GPU computations. Also, the project uses a \textit{pre-generation} approach, so it generate all possible combinations of kernels for all possible use-cases, since the is no way to provide template meta programming through raw C API.\\
+
+\textbf{GraphBLAST}. GraphBLAST~\cite{yang2019graphblast} library provides set of sparse linear algebra primitives and operations for computation on a single Nvidia GPU device. This project follows the GraphBLAS concepts. However, it provides C++ header-only interface and utilizes template meta programming along with Cuda C++ in order to support user types and functions customization. 
+
+Usage of a such API makes sense. It simplifies practical algorithms implementation, allows to offload the compiler with routine code generation work. However, this approach suffers from the header-only nature, since the whole library must be compiled for each executable file. What forces the end user to work with C++ compiler and actual Nvidia Cuda compiler, and recompile the whole project for each modification. 
+
+At this moment the project is in an active phase of the development. Authors of the project published the corresponding research report on the thematic conference. But, the stable and production-ready solution with full functionality is still unavailable.\\
+
+\textbf{Cusp}. Cusp~\cite{net:cusplibrary} library is a set of sparse linear algebra primitives with multiple backends support, such as multi-core CPU or Nvidia GPU. Library has a C++ template based interface. It utilizes meta programming for operations parametrization. It is based on a Nvidia Thrust~\cite{net:cuda_thrust}, which provides realization for fundamental operations, such as \textit{sort}, \textit{scan}, \textit{gather}, \textit{reduce}, etc.
+
+Although cusp is not inspired by GraphBLAS, it has similar to GraphBLAST interface. Also, it doesn't consider only graph analysis. Thus, it missing some important optimisations, which are done in GraphBLAST in order to speedup graph traversal. Also, library missing some important operations, such as matrix or vector reduction.\\
+
+\textbf{Cubool}. Cubool~\cite{net:cubool_project} project is an attempt to customize GraphBLAS primitives to boolean algebra usage only. There is a number of algorithms, which can be efficiently implemented using sparse boolean linear algebra. For example, it is graph reachability problem with a regular or context-free constrained path querying~\cite{inproceedings:cfpq_matrix_evaluation, inbook:kronecker_cfpq_adbis, inproceedings:matrix_cfpq, inproceedings:cfqp_matrix_with_single_source}.
+
+The library uses Nvidia Cuda API for GPU computations. It provides a pycubool~\cite{net:pycubool} package for a work in a Python runtime. This project is developed as part of this research in 2021. This library can be used as a foundation for this project. However, it has a number of fundamental limitations. So, it is not possible to generalize it for arbitrary data types.
+
+\subsection{Limitations}
+
+This section highlights the most critical limitations of existing solutions.\\
+
+\textbf{Imperative interface}. GraphBLAS standard and other libraries have similar imperative interface. The user is supposed to define the algorithms as simple sequence of procedures calls, where operations are executed one after another. This approach simplifies user experience at the cost of the performance. Some algorithms have non-trivial data dependencies, have some steps, which can be done in parallel. Thus, the library must have enough information about algorithm structure in order to execute in the most efficient way.\\
+
+\textbf{Templates usage}. There is a number of libraries which implement GraphBLAS in a form of C++ interface. These libraries heavily rely on a template meta programming for a generalization of a processed data. This approach simplifies implementation of the library, reduce number of auxiliary code (in this case, it is generated by the compiler). However, template based approach requires the whole project recompilation for each executable and for any change of a source code. Distribution of a such solution cannot be done in a form of binary file, since the user must compile the library locally each time for usage.\\
+
+\textbf{Nvidia Cuda}. The most research projects rely on Nvidia Cuda for GPU computations. It provides C++ feature and has a good vendor support. However, Cuda technology is specific only for Nvidia devices. So, a number of devices from other vendors is left behind, what may be critical for users.
+
+\subsection{GPU computations}
+
+\textit{GPGPU} (general-purpose computing on graphics processing units) is a technique of graphics processor utilization of a graphics card accelerator for a non-specific computations, which are typically done by a central processing unit of a computer. This technique allows to get a \textit{significant} speedup, when the computation involve large homogeneous data processing with a fixes set of instructions.
+
+There is a number of existing industry standards for a development of GPU programs, such as Vulkan~\cite{net:spec_vulkan}, OpenGL~\cite{net:spec_opencl}, DirectX~\cite{net:spec_direct3d} for graphics and computations tasks, as well as OpenCL~\cite{net:spec_opencl}, Nvidia Cuda~\cite{net:cuda_toolkit_docs}
+for computational tasks only.
+
+Existing graph analysis tools in most cases use OpenCL and Nvidia Cuda APIs for GPU work offload. The following sections provide a brief overview for each of this technologies.\\
+
+\textbf{Nvidia Cuda}. It is an industrial proprietary technology, created by a Nvidia, which is available on graphics devices of this vendor only. This API has rich language support for C and C++ programs. It supports template meta programming, what allows to implement generalized parallel GPU algorithms, such as \textit{sort}, \textit{scan}, \textit{reduce}, which are parameterized by the type of sorted element and used functions and predicates. Also, Nvidia provides a rich set of tools of debugging and profiling Cuda code. What simplifies development significantly.\\
+
+\textbf{OpenCL}. It is an open industrial standard for a programs' development, which utilize different accelerators for parallel computations. This standard is supported on a number of platforms, such as Nvidia, AMD, Intel, Apple M1, what makes it portable for usage on a large spectrum of devices. This API is designed in a form of C interface. It doesn't have built-in support for generalized meta-programming (opposite to Cuda support). Since this is an open standard, its supports varies significantly from platform to platform. What makes the development and testing of OpenCL application as a complex tasks.\\
+
+In this work the OpenCL is utilized as a API for GPU computations. This API is chosen, since its required for the project version 1.2 is supported on all actual devices. Also, this API allows dynamic code compilation in runtime for GPU execution. What makes it is usable for creating generalized library, where the user is able to implement custom primitive types and operations in a form of OpenCL code, passed as a string.
+
+\subsection{Implementation challenges on GPUs}
+
+GPU programming in a connection with a sparse linear algebra domain and large data processing introduces an number of challenges, which must be addressed by the developers of a such frameworks.\\
+
+\textbf{Fine-grained parallelism}. The most straightforward method of a parallelism is a vertex-based parallelism. However, in many graph, particularly scale-free graphs, the number of outgoing edges per vertex may vary dramatically. In this case, the time of processing of such a vertex will vary in the same way. Thus, assigning a tread per vertex will cause a significant load imbalance in a such case. 
+
+This problem may scale to sparse linear algebra approach, where a row of a matrix can be assigned per a thread. So, it is important to dynamically define the load balance and assign different number of threads, accounting the possible amount of work to occur.\\
+
+\textbf{Minimizing overhead}. GPU kernels running on a large load balanced dataset with a large number of computations achieve the maximum throughput. However, in some cases, the runtime may be dominated by the overhead, not by a computations. For example, GPU kernel may do not have enough work to occupy the whole computational device. In this case, many GPU processing block will be stalled and unused. 
+
+Synchronization points can also introduce additional overhead. GPU cores will finish their work and be stalled until the synchronization point is reached. Only after this point the new work will be offloaded. Also, one of the possible overheads may be introduced by the driver runtime. Dynamic JIT GPU compilation, data transfer to GPU and kernel launch may take additional time.\\
+
+\textbf{Computations intensity}. Good GPU kernel may be characterised as highly parallel grid of threads, where each group of threads process a small portion of the data, which must fit into the on-chip L1 memory. In this case the peak performance is achieved, since the memory latency is minimized to its limits. However, it is almost newer achieved in a graph processing kernels, where the working threads have a lot of unstructured memory load operations, which cannot be avoided.\\
