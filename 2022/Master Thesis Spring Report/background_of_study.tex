@@ -2,7 +2,7 @@
 
 This work is related to three major topics: graph analysis, sparse linear algebra and GPU computations. This section gives an overview for this topics, as well provides a survey of existing solutions and gives a brief introduction to a GPU programming.
 
-\subsection{Related work}
+\subsection{Graph analysis models}
 
 Large-scale graph processing frameworks for multi-core CPUs, distributed memory CPUs systems, and GPUs, accordingly to a Batari et al.~\cite{article:batarfi_survey_graphs} and Shi et al.~\cite{article:shi_survey_graphs} survey, can be classified into following categories.\\
 
@@ -52,7 +52,7 @@ Another important construct is a descriptor. Descriptor is a set of named parame
 
 \textbf{Operations.} GraphBLAS provides a number of commonly used linear algebra operations, such as matrix-vector and matrix-matrix products, transpose, element-wise multiplication. Also, there are some extra operations, which are more familiar for experienced developers, such as filtering, selection using predicate, reduction of matrix to vector or of vector to scalar, etc.
 
-The important concept of the GraphBLAS operations is shown in the figure~\ref{fig:gb_ops}. For example, we can consider matrix-vector and matrix-matrix product operations, called \textit{mxv} and \textit{mxm} respectively. From the users perspective, they only have to use these operations, when the implementation is free to select the best algorithm, which fits the sparsity of the input arguments. 
+The important concept of the GraphBLAS operations is shown in the figure~\ref{fig:gb_ops}. For example, we can consider matrix-vector and matrix-matrix product operations, called \textit{mxv} and \textit{mxm} respectively. From the users perspective, they only have to use these operations, when the implementation is free to select the best algorithm, which fits the sparsity of the input arguments.
 
 \begin{figure}[h]
     \centering
@@ -60,6 +60,68 @@ The important concept of the GraphBLAS operations is shown in the figure~\ref{fi
     \caption{Key operations of the GraphBLAS standard and their implementations.}
     \label{fig:gb_ops}
 \end{figure}
+
+\textbf{Algorithms.} Using GraphBLAS constructs it is possible to write generalized graph analysis algorithms. There is a number of common and well-known graph algorithms, such as breadth-first search (BFS), single-source shortest path (SSSP), triangles counting (TC), connected components (CC), etc. which have a linear-algebra based formulation, described by Kepner et al.~\cite{misc:la_graph}.
+
+For example, consider a procedure with BFS algorithm in listing~\ref{alg:bfs_graphblas}. As arguments it accepts vector $v$ to store levels of reached vertices, adjacency matrix $A$, index of the start vertex $s$, and number of graph vertices $n$. Algorithm starts in lines \textbf{5 -- 9} with initialization of result vector. Also, it allocates vector $q$, which is used as a \textit{frontier} of currently active vertices to make a traversal step. The primary traversal loop in lines \textbf{14 -- 19} of the algorithm works while the frontier has at least one active vertex. In the body, it updates current traversal level. Then, it assigns current level to currently reached vertices in the frontier in line \textbf{16} using \textit{apply} function. Then in the line \textbf{17} it makes traversal step to find all children of current frontier vertices. Note, it uses inverted $v$ as a mask with \textit{GrB\_DESC\_RC} to filter our already visited vertices.
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{1.0,1.0,1.0}
+
+\lstdefinestyle{codelistingstyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=codelistingstyle}
+
+\begin{algorithm}[]
+\floatname{algorithm}{Listing}
+\caption{Breadth-first search using GraphBLAS API}
+\label{alg:bfs_graphblas}
+\begin{lstlisting}[language=C++]
+#include "GraphBLAS.h"
+
+GrB_Info BFS(GrB_Vector *v, GrB_Matrix A, GrB_Index s, GrB_Index n)
+{
+  GrB_Vector_new(v, GrB_INT32, n);
+
+  GrB_Vector q;
+  GrB_Vector_new(&q, GrB_BOOL, n);
+  GrB_Vector_setElement(q, true, s); 
+
+  int32_t level = 0;
+  GrB_Index nvals;
+  
+  do {
+    ++level;                                               
+    GrB_apply(*v, GrB_NULL, GrB_PLUS_INT32, GrB_SECOND_INT32, q, level, GrB_NULL);       
+    GrB_vxm(q, *v, GrB_NULL, GrB_LOR_LAND_SEMIRING_BOOL, q, A, GrB_DESC_RC);                           
+    GrB_Vector_nvals(&nvals, q);
+  } while (nvals);
+  
+  GrB_free(&q);
+
+  return GrB_SUCCESS;
+}
+\end{lstlisting}
+\end{algorithm}
 
 \subsection{Existing frameworks}
 
@@ -124,4 +186,4 @@ This problem may scale to sparse linear algebra approach, where a row of a matri
 
 Synchronization points can also introduce additional overhead. GPU cores will finish their work and be stalled until the synchronization point is reached. Only after this point the new work will be offloaded. Also, one of the possible overheads may be introduced by the driver runtime. Dynamic JIT GPU compilation, data transfer to GPU and kernel launch may take additional time.\\
 
-\textbf{Computations intensity}. Good GPU kernel may be characterised as highly parallel grid of threads, where each group of threads process a small portion of the data, which must fit into the on-chip L1 memory. In this case the peak performance is achieved, since the memory latency is minimized to its limits. However, it is almost newer achieved in a graph processing kernels, where the working threads have a lot of unstructured memory load operations, which cannot be avoided.\\
+\textbf{Computations intensity}. Good GPU kernel may be characterised as highly parallel grid of threads, where each group of threads process a small portion of the data, which must fit into the on-chip L1 memory. In this case the peak performance is achieved, since the memory latency is minimized to its limits. However, it is almost newer achieved in a graph processing kernels, where the working threads have a lot of unstructured memory load operations with pure computational work, which cannot be avoided.\\
