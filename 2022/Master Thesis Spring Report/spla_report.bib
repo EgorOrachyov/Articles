@@ -885,3 +885,32 @@ keywords = {GPU, runtime framework, Graph processing}
   archivePrefix={arXiv},
   primaryClass={cs.MS}
 }
+
+% Taskflow library
+@article{Huang2022TaskflowAL,
+  title={Taskflow: A Lightweight Parallel and Heterogeneous Task Graph Computing System},
+  author={Tsung-Wei Huang and Dian-Lun Lin and Chun-Xun Lin and Yibo Lin},
+  journal={IEEE Transactions on Parallel and Distributed Systems},
+  year={2022},
+  volume={33},
+  pages={1303-1320}
+}
+
+% Boost compute library
+@inproceedings{10.1145/2909437.2909454:boost:compute,
+    author = {Szuppe, Jakub},
+    title = {Boost.Compute: A Parallel Computing Library for C++ Based on OpenCL},
+    year = {2016},
+    isbn = {9781450343381},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    url = {https://doi.org/10.1145/2909437.2909454},
+    doi = {10.1145/2909437.2909454},
+    abstract = {Boost.Compute is a powerful C++ header-only template library for parallel computing based on OpenCL. It has a layered architecture and acts both as a thin C++ wrapper over the OpenCL API and as a feature-rich interface to high-level constructs that resemble the functionality of the STL and is just as easy to use.Through its template-based design, Boost.Compute seeks to further provide flexible OpenCL support in C++ projects via meta-programming. Meta-programming is not available in standard C-based OpenCL, and OpenCL C++ kernel language is currently only provisional. SYCL is intended as a prospective C++ abstraction layer over OpenCL, but it is still under development and requires a special compiler. Bolt and Thrust are C++-based parallel-computing libraries, but they are tied to specific hardware vendors. Boost.Compute on the other hand is a vendor-neutral solution for GPUs and multi-core CPUs that is available now, and it works with any standard C++ compiler and on all OpenCL platforms.Boost.Compute has been accepted for integration with the official Boost C++ libraries. With this step, and considering the large number of Boost users, usage of Boost.Compute and visibility of OpenCL among C++ developers is likely to increase. This technical presentation is therefore intended as a comprehensive overview of Boost.Compute for current and prospective users of the library and covers the library's overall architecture, its low-level and high-level functionality and advanced topics such as custom functions, closures and lambda expressions. The presentation also describes how a custom template-based OpenCL library can be designed on top of Boost.Compute. Examples are included throughout the presentation to aid in a better understanding. Among others, I will demonstrate how advanced features of the library can lead to a simple and efficient C++-only solution for BLAS calculations. The architectural presentation of the library will be followed by a presentation of current performance results of the library and a comparison with competing solutions. I will conclude the presentation with insights that I gained during Google Summer of Code '15 and my overall experience in contributing to Boost.Compute, which I hope to be of interest to the wider developer community.},
+    booktitle = {Proceedings of the 4th International Workshop on OpenCL},
+    articleno = {15},
+    numpages = {39},
+    keywords = {Parallel computing, Boost Compute, Boost C++ Libraries, C++, OpenCL},
+    location = {Vienna, Austria},
+    series = {IWOCL '16}
+}

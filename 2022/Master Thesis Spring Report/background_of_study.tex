@@ -2,7 +2,7 @@
 
 This work is related to three major topics: graph analysis, sparse linear algebra and GPU computations. This section gives an overview for this topics, as well provides a survey of existing solutions and gives a brief introduction to a GPU programming.
 
-\subsection{Graph analysis models}
+\subsection{Graph analysis approach}
 
 Large-scale graph processing frameworks for multi-core CPUs, distributed memory CPUs systems, and GPUs, accordingly to a Batari et al.~\cite{article:batarfi_survey_graphs} and Shi et al.~\cite{article:shi_survey_graphs} survey, can be classified into following categories.\\
 
@@ -64,30 +64,6 @@ The important concept of the GraphBLAS operations is shown in the figure~\ref{fi
 \textbf{Algorithms.} Using GraphBLAS constructs it is possible to write generalized graph analysis algorithms. There is a number of common and well-known graph algorithms, such as breadth-first search (BFS), single-source shortest path (SSSP), triangles counting (TC), connected components (CC), etc. which have a linear-algebra based formulation, described by Kepner et al.~\cite{misc:la_graph}.
 
 For example, consider a procedure with BFS algorithm in listing~\ref{alg:bfs_graphblas}. As arguments it accepts vector $v$ to store levels of reached vertices, adjacency matrix $A$, index of the start vertex $s$, and number of graph vertices $n$. Algorithm starts in lines \textbf{5 -- 9} with initialization of result vector. Also, it allocates vector $q$, which is used as a \textit{frontier} of currently active vertices to make a traversal step. The primary traversal loop in lines \textbf{14 -- 19} of the algorithm works while the frontier has at least one active vertex. In the body, it updates current traversal level. Then, it assigns current level to currently reached vertices in the frontier in line \textbf{16} using \textit{apply} function. Then in the line \textbf{17} it makes traversal step to find all children of current frontier vertices. Note, it uses inverted $v$ as a mask with \textit{GrB\_DESC\_RC} to filter our already visited vertices.
-
-\definecolor{codegreen}{rgb}{0,0.6,0}
-\definecolor{codegray}{rgb}{0.5,0.5,0.5}
-\definecolor{codepurple}{rgb}{0.58,0,0.82}
-\definecolor{backcolour}{rgb}{1.0,1.0,1.0}
-
-\lstdefinestyle{codelistingstyle}{
-    backgroundcolor=\color{backcolour},   
-    commentstyle=\color{codegreen},
-    keywordstyle=\color{magenta},
-    numberstyle=\tiny\color{codegray},
-    stringstyle=\color{codepurple},
-    basicstyle=\ttfamily\footnotesize,
-    breakatwhitespace=false,         
-    breaklines=true,                 
-    captionpos=b,                    
-    keepspaces=true,                 
-    numbers=left,                    
-    numbersep=5pt,                  
-    showspaces=false,                
-    showstringspaces=false,
-    showtabs=false,                  
-    tabsize=2
-}
 
 \lstset{style=codelistingstyle}
 
