@@ -100,7 +100,7 @@ Computational expression is constructed in a form of the DAG in the library. Nod
     \item \textit{Matrix triangular upper.} Constructs a triangular matrix from an upper part of the original matrix above main diagonal.
 \end{itemize}
 
-\subsection{Optimizations}
+% \subsection{Optimizations}
 
 \subsection{Running example}
 
@@ -115,11 +115,9 @@ void spla::Bfs(RefPtr<Vector> &sp_v,
                const RefPtr<Matrix> &sp_A, 
                Index s, 
                const RefPtr<Descriptor> &descriptor) {
-    bool fixedDeviceAllocation = false;
     float denseFactor = 1.0f;
 
     if (descriptor.IsNotNull()) {
-        fixedDeviceAllocation = descriptor->IsParamSet(Param::DeviceFixedStrategy);
         descriptor->GetParamT(Param::DenseFactor, denseFactor);
     }
 
@@ -169,15 +167,17 @@ As an example of the developed Spla library usage consider breadth-first search 
 
 Algorithm procedure is declared in the \textit{spla} namespace in the public interface file. The implementation of the algorithm is defined in the private cpp source file, compiled into shared object library. Procedure expects as an input reference to the result vector $v$ where to store reached depths of vertices, adjacency matrix of the graph $A$, index of the start vertex $s$ and an optional descriptor to tweak algorithm execution.
 
-Before actual execution, parameters are read from the descriptor in liners \textbf{5 -- 11}, global library state obtained from the matrix in line \textbf{13} and graph size saved as $n$ in line \textbf{14}.
+Before actual execution, parameters are read from the descriptor in liners \textbf{5 -- 9}, global library state obtained from the matrix in line \textbf{11} and graph size saved as $n$ in line \textbf{12}.
 
-Then in lines \textbf{16 -- 18} data containers required for the algorithm execution are allocated. Vector with reached vertices as well as scalar are created with \textit{int32} type, frontier of active vertices for the search is allocated with \textit{void} type, since we are interested only in the structure of the frontier.
+Then in lines \textbf{14 -- 16} data containers required for the algorithm execution are allocated. Vector with reached vertices as well as scalar are created with \textit{int32} type, frontier of active vertices for the search is allocated with \textit{void} type, since we are interested only in the structure of the frontier.
 
-In lines \textbf{20 -- 23} some descriptors for expression nodes are created. Descriptor used to update reached vertices in the \textit{assign} node is configured with \textit{AccumResult} parameter. This parameter tells library, that the previous content of the result vector must be preserved and accumulated with new values. Traversal descriptor is created with \textit{MaskComplement} parameter. This parameter tells library that passed mask must be interpreted as inverted one.
+In lines \textbf{18 -- 21} some descriptors for expression nodes are created. Descriptor used to update reached vertices in the \textit{assign} node is configured with \textit{AccumResult} parameter. This parameter tells library, that the previous content of the result vector must be preserved and accumulated with new values. Traversal descriptor is created with \textit{MaskComplement} parameter. This parameter tells library that passed mask must be interpreted as inverted one.
 
-Initial frontier start vertex is set in lines \textbf{25 -- 27}. Temporary expression is created and \textit{write} node used to write start index to the $q$. Since frontier has void type, index is passed without values.
+Initial frontier start vertex is set in lines \textbf{23 -- 25}. Temporary expression is created and \textit{write} node used to write start index to the $q$. Since frontier has void type, index is passed without values.
 
-The algorithm iterates in the \textit{while loop} in lines \textbf{33 -- 50} until frontier of vertices to visit is not empty. Iteration expression is construed in the lines \textbf{35 -- 37}. Firstly, the scalar is updated with new depth value. Then, this depths are assigned to the result vector using frontier as $v[q] = depth$. After assign new frontier is obtained as $q[!v] = q \times A$. Note, that vector $v$ used as inverted mask to filter all already visited vertices. In lines \textbf{39 -- 43} sparse to dense transition of the vector $v$ is done, if density factor of $v$ exceeds predefined parameter. This is an heuristic optimization done in order to reduce overhead of sparse operation in a case of very dense result.
+The algorithm iterates in the \textit{while loop} in lines \textbf{31 -- 48} until frontier of vertices to visit is not empty. Iteration expression is construed in the lines \textbf{33 -- 35}. Firstly, the scalar is updated with new depth value. Then, this depths are assigned to the result vector using frontier as $v[q] = depth$. After assign new frontier is obtained as $q[!v] = q \times A$. Note, that vector $v$ used as inverted mask to filter all already visited vertices. In lines \textbf{37 -- 41} sparse to dense transition of the vector $v$ is done, if density factor of $v$ exceeds predefined parameter. This is an heuristic optimization done in order to reduce overhead of sparse operation in a case of very dense result.
+
+After the execution the vector $v$ for each graph vertex stores either the depth of the vertex or nothing in the case if this vertex is not reachable from the BFS source vertex $s$. Since library API relies on C++ RAII mechanism, no explicit resources cleanup is required after the execution.
 
 % \section{Детали реализации}
 

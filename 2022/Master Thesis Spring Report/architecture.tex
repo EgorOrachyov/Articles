@@ -1,10 +1,10 @@
 \section{Architecture}
 
-This section covers the architecture of the developed library, primary components and modules, the sequence of operations processing on the GPUs. The library is designed in order to overcome the limitation of the existing solutions, mentioned in the previous section.
+This section covers the architecture of the developed sparse linear algebra (Spla for short) library, primary components and modules, the sequence of operations processing on the GPUs. The library is designed in order to overcome the limitation of the existing solutions, mentioned in the previous section.
 
 \subsection{Design principles}
 
-SPLA library is designed the way to maximize potential library performance, simplify its implementation and extensions, and to provided the end-user verbose, but effective interface allowing customization and precise control over operations execution. These ideas are captured in the following principles.
+The library is designed the way to maximize potential library performance, simplify its implementation and extensions, and to provided the end-user verbose, but effective interface allowing customization and precise control over operations execution. These ideas are captured in the following principles.
 
 \begin{itemize}
     \item \textbf{OpenCL API}. The library must use the OpenCL API to accelerate computations on a single OpenCL-compatible GPU device in the system. This API is supported on a variety of graphics accelerators, and also allows you to dynamically compile GPU code at runtime, which saves the user from installing and using a third-party specialized compiler.
