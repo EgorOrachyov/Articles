@@ -1,0 +1,29 @@
+\section{Results}
+
+The following results were achieved in this work.
+
+\begin{itemize}
+    \item The survey of the field was conducted. Model for a graph analysis were shown. Also, the concept of the linear algebra based approach was described in a great detail with a respect to a graph traversal and existing solutions. Introduction into a GraphBLAS standard was provided. Existing implementations, frameworks and most significant contributions for a graph analytic were studied. Their limitations were highlighted. 
+    
+    \item General-purpose GPU computations concept was covered. Different APIs for GPU programming were presented. Their advantages and disadvantages are covered. General GPU programming challenges and pitfalls are highlighted. 
+    
+    \item The architecture of the library for a generalized sparse linear algebra for GPU computations was developed. The architecture and library design was based on a project requirements, as well as on a limitation and experience of the existing solutions. 
+    
+    \item The implementation of the library accordingly to the developed architecture was started. The core of the library, expressions processing, foundation OpenCL functionality, common operations implementations were provided.
+    
+    \item Several algorithms for a graph analysis were implemented using developed library API.
+    
+    \item The preliminary experimental study of the proposed artifacts was conducted. Obtained results allowed to conclude, that the chosen method of the library development is a promising way to a high-performance graph analysis in terms of the linear algebra on a wide family of GPU devices. 
+\end{itemize}
+
+The following tasks must be done to complete this work.
+
+\begin{itemize}
+    \item Extend a set of available linear algebra operations, implemented in the library.
+
+    \item Implement a set of a common graph analysis algorithms utilising library primitives and operations, as well as introducing some optimizations  for this algorithms.
+    
+    \item Conduct a complete experimental study of the set of common graph analysis algorithms. Extend the dataset and study the edge cases of library workarounds.
+\end{itemize}
+
+The library source code is published on a GitHub platform. It is available at \url{https://github.com/JetBrains-Research/spla}.
