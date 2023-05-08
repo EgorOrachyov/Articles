@@ -1,0 +1,15 @@
+\section{Results}
+
+The following results were achieved in this work.
+
+\begin{itemize}
+    \item The survey of the field was conducted. Model for a graph analysis were shown. Also, the concept of the linear algebra based approach was described in a great detail with a respect to a graph traversal and existing solutions. Introduction into a GraphBLAS standard was provided. Existing implementations, frameworks and most significant contributions for a graph analytic were studied. Their limitations were highlighted. General-purpose GPU computations concept was covered. Different APIs for GPU programming were presented. Their advantages and disadvantages were covered. General GPU programming challenges and pitfalls were highlighted. 
+    
+    \item The architecture of the library for a generalized sparse linear algebra for GPU computations was developed. The architecture and library design was based on a project requirements, as well as on a limitation and experience of the existing solutions. The differences with GraphBLAS standard were stated.
+    
+    \item The library was implemented accordingly to the developed architecture. The core of the library, interface, data containers, built-in scalar data types, built-in element-wise functions, expressions processing, OpenCL backend functionality, common linear algebra operations implementations were covered. Several graph algorithms for a graph analysis were implemented using developed library API.
+    
+    \item The preliminary experimental study of the proposed artifacts was conducted. Obtained results allowed to conclude, that the chosen method of the library development is a promising way to a high-performance graph analysis in terms of the linear algebra on a wide family of GPU devices. The proposed solution showed comparable performance to existing state-of-the-art solutions. The developed library showed a scalability on different device vendors GPUs. Also, the proposed solutions got an acceptable performance on integrated GPUs in some cases even if compared with highly-optimized multi-core CPU frameworks.
+\end{itemize}
+
+The library source code is published on a GitHub platform. It is available at \url{https://github.com/SparseLinearAlgebra/spla}.
