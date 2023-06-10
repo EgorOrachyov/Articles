@@ -1,7 +1,7 @@
 \section{Evaluation}
 
 For performance analysis of the proposed solution, a few most common graph algorithms were evaluated using real-world sparse matrix data. 
-The following tools for comparison were chosen: LaGraph~\cite{misc:la_graph} in connection with SuiteSparse~\cite{article:suite_sparse_for_graph_problems} as a baseline CPU tool, Gunrock~\cite{article:gunrock} and GraphBLAST~\cite{yang2019graphblast} as a Nvidia GPU tools. 
+The following tools for comparison were chosen: LaGraph~\cite{misc:la_graph}~(ver. Feb 13, 2022) in connection with SuiteSparse~\cite{article:suite_sparse_for_graph_problems}~(ver. Jan 14, 2022) as a baseline CPU tool, Gunrock~\cite{article:gunrock}~(ver. Nov 7, 2021) and GraphBLAST~\cite{yang2019graphblast}~(ver. Jun 18, 2021) as a Nvidia GPU tools. 
 Also, algorithms were tested on several devices with distinct OpenCL vendors in order to validate the portability of the proposed solution. 
 
 \subsection{Research questions}
@@ -28,27 +28,22 @@ In general, these evaluation intentions are summarized in the following research
 Spla and LaGraph were compiled with GCC v9.4. Gunrock and GraphBLAST were compiled with GCC v8.4 and Nvidia NVCC v10.1.
 Release mode and maximum optimizations level were enabled for all tested programs. 
 
-All tests are averaged across 10 runs. The deviation of measurements does not exceed the threshold of 10 percent. Additional warm-up run for each test execution is excluded from measurements. Only actual execution time of algorithms is measured. Data loading time, preparation, format transformations, and host-device initial communications are excluded from time measurements. For measurements standard official benchmarks are used, which provided by compared tools developers.
+\subsection{Methodology}
+
+All tests are averaged across 10 runs. The deviation of measurements does not exceed the threshold of 10 percent. Additional warm-up run for each test execution is excluded from measurements. 
+
+Only actual execution time of algorithms is measured. Data loading time, preparation, format transformations, and host-device initial communications are excluded from time measurements. 
+
+The graph vertex with index 1 is set as the initial traversal vertex in the algorithms BFS and SSSP for all tested instruments and all tested devices.
+
+For measurements standard official benchmarks are used, which provided by compared tools developers. These benchmarks are intended for performance comparison. Thus, all tools agree on measurements, what is clearly seen from the source code of those benchmarks.
 
 \subsection{Graph algorithms}
 
 For preliminary study \textit{breadth-first search} (BFS), \textit{single-source shortest paths} (SSSP), \textit{page rank} (PR) and \textit{triangles counting} (TC) algorithms were chosen.
 Implementation of those algorithms for competitors is used from official source code repositories with default parameters. Compared tools are allowed to make any optimizations as long as the result remains correct.
-The graph vertex with index 1 is set as the initial traversal vertex in the algorithms BFS and SSSP for all tested instruments and all tested devices.
 
 \subsection{Dataset}
-
-Thirteen matrices with graph data were selected from the Sparse Matrix Collection at University of Florida~\cite{dataset:sparse_matrix_collection}. 
-Information about graphs is summarized in Table~\ref{dataset:info}. 
-The dataset is converted to undirected graphs. 
-Self-loops and duplicated edges are removed. 
-Average, sd and max metrics relate to out degree property of the vertices.
-For SSSP weights are initialized using pseudo-random generator with uniform $[0, 1]$ distribution of floating-point values.
-
-Graphs are roughly divided into two groups. 
-The first group represents relatively dense graphs, where the number of edges per node is sufficient on average to effectively load the GPU with useful work. 
-The second group represents relatively sparse graphs, where the average vertex degree is below the typical GPU vector register size, and the search depth reaches hundreds of hoops. 
-Graphs are sorted in ascending order by the number of vertices within each group.
 
 \begin{table}[tbp]
 \caption{Dataset description.} 
@@ -78,6 +73,12 @@ Graphs are sorted in ascending order by the number of vertices within each group
     \label{dataset:info}
 \end{center}
 \end{table}
+
+Thirteen matrices with graph data were selected from the Sparse Matrix Collection at University of Florida~\cite{dataset:sparse_matrix_collection}. Information about graphs is summarized in Table~\ref{dataset:info}. This is a common graphs collection used for sparse linear algebra and graph algorithms benchmarks in other works in the domain. These graphs represents typical analysed data structure, sparsity, distribution, and allows one to study common behaviour and performance characteristics of developed libraries.
+
+The dataset is converted to undirected graphs. Self-loops and duplicated edges are removed. Average, sd and max metrics relate to out degree property of the vertices. For SSSP weights are initialized using pseudo-random generator with uniform $[0, 1]$ distribution of floating-point values.
+
+Graphs are roughly divided into two groups. The first group represents relatively dense graphs, where the number of edges per node is sufficient on average to effectively load the GPU with useful work. The second group represents relatively sparse graphs, where the average vertex degree is below the typical GPU vector register size, and the search depth reaches hundreds of hoops. Graphs are sorted in ascending order by the number of vertices within each group.
 
 \subsection{Results Summary}
 

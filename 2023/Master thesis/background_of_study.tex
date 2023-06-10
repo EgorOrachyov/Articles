@@ -1,6 +1,6 @@
 \section{Background of study}
 
-This section provides a brief overview of existing solutions for graph analysis on GPU. Also, it describes the concepts of the GraphBLAS standard, highlights some of its shortcomings and limitations on the way to a full-fledged GPU implementation. Finnaly, this section gives a brief introduction to a GPU programming.
+This section provides a brief overview of existing solutions for graph analysis on GPU. Also, it describes the concepts of the GraphBLAS standard, highlights some of its shortcomings and limitations on the way to a full-fledged GPU implementation. Finally, this section gives a brief introduction to a GPU programming.
 
 \subsection{Related Work}
 
@@ -12,15 +12,15 @@ Existing GPU-based frameworks typically adopt vertex-centric model, where comput
 
 \textbf{BSP model}. Medusa~\cite{article:medusa}, Gunrock~\cite{article:gunrock} use BSP model. In this model the computation is divided into a series of supper steps, where local computation occurs within each step with message passing. This model allows local computations, local memory usage, reduces synchronization and kernel launch overhead, but may suffer from workload imbalance among threads in super step.
 
-Gunrock, one of the fastest programmable frameworks for GPU graphs analysis~\cite{article:shi_survey_graphs},  has solved this issue introducing several workload mapping techniques. This improvement allows to achieve great speedup in almost all algorithms. However, Gunrock is only Cuda-oriented framework with relatively low-level API, which requires a significant programming effort to implement a particular algorithm for analysis. Also, this framework utilizes a number of ad hoc optimizations. So it is limited in it a generalization.\\
+Gunrock, one of the fastest programmable frameworks for GPU graphs analysis~\cite{article:shi_survey_graphs},  has solved this issue introducing several workload mapping techniques. This improvement allows to achieve great speedup in almost all algorithms. However, Gunrock is Cuda-oriented framework with relatively low-level API, which requires a significant programming effort to implement a particular algorithm for analysis. Also, this framework utilizes a number of ad-hoc optimizations. So it is limited in it a generalization.\\
 
-\textbf{Linear algebra based model}. This model was pioneered by Buluç et al.~\cite{article:combblas} in CombinationalBLAS, which introduced primitives for a large graph data analysis for a distributed memory CPU systems. This model allows one to define graph algorithms using linear algebra operations over matrices and vectors with some custom user-define element-wise operations. This allows one to express complex computations in few lines of code without significant performance sacrifice. What makes it is promising for implementation. 
+\textbf{Linear algebra based model}. This model was pioneered by Buluç et al.~\cite{article:combblas} in CombinationalBLAS, which introduced primitives for a large graph data analysis for a distributed memory CPU systems. This model allows one to define graph algorithms using linear algebra operations over matrices and vectors with some custom user-define element-wise operations. This allows one to express complex computations in a few lines of code without significant performance sacrifice. What makes it is promising for implementation. 
 
 Linear algebra approach relies on the fact, that the graph traversal can be represented as matrix-vector multiplication as shown in figure~\ref{fig:gt_mxv}. The graph is stored in an adjacency matrix $A$. The set of active vertices, also called \textit{frontier}, is represented as a vector $v$, with non-zero elements for vertices of the front. Transposed matrix $A$ multiplied by a vector $v$ on the right gives a new frontier with active vertices for the next iteration. In order to traverse all vertices only once, we have to store additional vector with visited vertices. This vector can be used in an inverse element-wise multiplication to filter out those vertices from the frontier, which are already visited. 
 
 This is a fundamental concept, which is lying in the most graph traversal based algorithms, such as breadth-first search or single source shortest paths. This method can be extended even further if we consider a multiple-source traversal. In this we have a number of frontier vectors, which can be stored as a matrix. It allows one use matrix-matrix product for a such task.
 
-The research community formalized linear algebra based model in a form of GraphBLAS standard~\cite{paper:graphblas_foundations}, which has a number of implementations for CPUs, such as high-performance SuiteSparse library~\cite{article:suite_sparse_for_graph_problems} or Huawei GraphBLAS implementation~\cite{article:hu_graphblas_impl}, and some adaptations for a GPUs analysis. 
+The research community formalized linear algebra based model in a form of GraphBLAS standard~\cite{paper:graphblas_foundations}, which has a number of implementations for CPUs, such as high-performance SuiteSparse library~\cite{article:suite_sparse_for_graph_problems}, Huawei GraphBLAS implementation~\cite{article:hu_graphblas_impl}, and some adaptations for a GPUs analysis. 
 
 GraphBLAS SuiteSprase~\cite{article:suite_sparse_for_graph_problems} is a fully featured reference GraphBLAS implementation for multi-core CPUs computations. It is written using C language and OpenMP. Library is fully compatible with GraphBLAS API standard. It is available for C and C++ programs usage. Also, it provides a number of officially and unofficially supported packages, which export the functionality into other runtime, such as Java or Python (via pygraphblas~\cite{net:pygraphblas}). At this moment, the work is done in the project in order to support Nvidia Cuda for GPU computations.
 
@@ -60,7 +60,7 @@ There is a number of semirings, which can be used to solve different types of pr
 
 \textbf{Programming constructs}. GraphBLAS provides extra objects, which are required for practical algorithms implementation. One of these programming features is a concept of the mask. Any matrix or vector can be used as a mask, which structure defines the structure of the result. It is a crucial and essential concept, since in many cases we are interested only in a partial result, not the whole matrix or vector. Mask is passed as extra argument, and implementation is free to make the fusion of the mask into the operation.
 
-Another important construct is a descriptor. Descriptor is a set of named parameters and associated with them values. Descriptor used to tell the implementation, that, for example, mask complementary pattern required, or result must not be accumulated with old content. This concept can be extended further, what is done in some GraphBLAS extensions.\\
+Another important construct is a descriptor. Descriptor is a set of named parameters and values associated with them. Descriptor used to tell the implementation, that, for example, mask complementary pattern required, or result must not be accumulated with old content. This concept can be extended further, what is done in some GraphBLAS extensions.\\
 
 \textbf{Operations.} GraphBLAS provides a number of commonly used linear algebra operations, such as matrix-vector and matrix-matrix products, transpose, element-wise multiplication. Also, there are some extra operations, which are more familiar for experienced developers, such as filtering, selection using predicate, reduction of matrix to vector or of vector to scalar, etc.
 
@@ -153,7 +153,7 @@ In this work the OpenCL is utilized as a API for GPU computations. This API is c
 
 This section gives an overview for a typical GPU architecture. Understanding of a target hardware is a key to performance optimizations, required to speed up developed GPU library.
 
-The particular GPU architecture is a very controversial topic for a discussion. Implementation details of a given GPU depend on a number of factors, such a GPU's vendor, family, generation, etc. Thus, writing an efficient GPU code forces a programmer to learn a particular details of a target processor for execution. For the sake of brevity, let's focus on an existing, open-source and well-document state-of-the-art modern GPU microarchitecture such as AMD's RNDA.
+The particular GPU architecture is a very controversial topic for a discussion. Implementation details of a given GPU depend on a number of factors, such a GPU's vendor, family, generation, etc. Thus, writing an efficient GPU code forces a programmer to learn a particular details of a target processor for execution. For the sake of brevity, let's focus on an existing, open-source and well-document state-of-the-art modern GPU microarchitecture such as AMD's RDNA.
 
 Radeon DNA (RDNA) is a GPU microarchitecture and accompanying instructions set architecture developed by AMD. The block diagram of Radeon RX 5700 XT GPU having RDNA architecture is depicted in a figure~\ref{fig:rdna_gpu}. The GPU itself is placed on a infinity fabric surface for a fast data interconnect between units. PCIe controller allows communication of a GPU with the system RAM. 
 
@@ -166,7 +166,7 @@ Radeon DNA (RDNA) is a GPU microarchitecture and accompanying instructions set a
 
 The GPU is composed of two \textit{shader engines}. Each engine has a number of \textit{shader arrays}. Each array possess own L1 cache and a set of actual \textit{dual compute units}, which responsible for computation work. Shader engines surrounded by a L2 shared cache. Any of L2 banks can be accessed by shader array during the computations.
 
-Programs for the execution are structured in a form of \textit{kernels}. Kernel is a single stream of instructions that operate on large number of data parallel work items. The work items organized into a work grouts, which can communicate explicitly through local memory. The shader compiler sub-divides the work groups further into micro-architecture specific wavefronts that are scheduled for parallel execution on a compute unit.
+Programs for the execution are structured in a form of \textit{kernels}. Kernel is a single stream of instructions that operate on large number of data parallel work items. The work items organized into a work groups, which can communicate explicitly through local memory. The shader compiler sub-divides the work groups further into micro-architecture specific wavefronts that are scheduled for parallel execution on a compute unit.
 
 \begin{figure}[h]
     \centering
@@ -177,7 +177,7 @@ Programs for the execution are structured in a form of \textit{kernels}. Kernel 
 
 Dual compute unit in AMD architecture is depicted in a figure~\ref{fig:rdna_dcu}. Compiler crates wavefronts of a size 32 (wave32). Every item inside a wavefront is executing the same instruction (SIMD). Each compute unit (CU) includes four SIMD units. Each SIMD unit has 32 ALUs, has 32-wide vector registers and scalar registers. SIMD executes full wavefront instruction over single clock cycle.
 
-Thus, writing an OpenCL kernel requires saturation of CU with works as well as keeping all slots of a SIMD processor active. Elimination of some of these features causes inefficiency and, as the consequences, performance drop of a target application.
+Thus, writing an OpenCL kernel requires saturation of CU with work as well as keeping all slots of a SIMD processor active. Elimination of some of these features causes inefficiency and, as the consequences, performance drop of a target application.
 
 \subsection{OpenCL concepts}
 

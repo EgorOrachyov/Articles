@@ -258,6 +258,8 @@ The matrix storage container supports following formats.
 
 \begin{itemize}
     \item \textbf{CPU dictionary of keys (Dok)}. This format is used for an incremental matrix building on a CPU side as it is done for a vector. The memory space used by this format is proportional to the number of non-zero entries. This format provides fast query and insertion operations at cost of inefficient memory layout.
+
+    \item \textbf{CPU list of lists (LiL)}. This format is used for an incremental matrix building on a CPU side as well as DoK. The memory space used by this format is proportional to the number of non-zero entries. This format provides more efficient memory layout at the cost of slower search, insert and deletion operations. Thus, LiL is better suited for sequential ordered construction and for some operations on a CPU side, such as reduction, product, map, etc.
     
     \item \textbf{CPU compressed sparse row (CSR)}. Compressed sparse row is one of the most common formats for a sparse matrix representation. The data is stored in a form of three arrays: rows offsets, column indices and column values. Rows values are packed. They are stored continuously. Column indices of each value in a row and each value are packed together in index and value arrays. Offsets to the start of a particular row are stored in offsets buffer. Total memory cost of the storage proportional to the number of entries in sparse arrays. Offsets buffers always allocated using total number of rows of a matrix. 
     
